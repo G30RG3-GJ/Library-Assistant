@@ -40,12 +40,32 @@ public class LoginController implements Initializable {
     @FXML
     private void handleLoginButtonAction(ActionEvent event) {
         String uname = StringUtils.trimToEmpty(username.getText());
-        String pword = DigestUtils.shaHex(password.getText());
+        String pword = password.getText();
 
-        if (uname.equals(preference.getUsername()) && pword.equals(preference.getPassword())) {
-            closeStage();
-            loadMain();
-            LOGGER.log(Level.INFO, "User successfully logged in {}", uname);
+        if (uname.equals(preference.getUsername())) {
+            String storedPassword = preference.getPassword();
+            boolean loginSuccess = false;
+
+            if (storedPassword.length() == 64) {
+                if (DigestUtils.sha256Hex(pword).equals(storedPassword)) {
+                    loginSuccess = true;
+                }
+            } else if (storedPassword.length() == 40) {
+                if (DigestUtils.shaHex(pword).equals(storedPassword)) {
+                    loginSuccess = true;
+                    preference.setPassword(pword);
+                    Preferences.writePreferenceToFileWithoutAlert(preference);
+                }
+            }
+
+            if (loginSuccess) {
+                closeStage();
+                loadMain();
+                LOGGER.log(Level.INFO, "User successfully logged in {}", uname);
+            } else {
+                username.getStyleClass().add("wrong-credentials");
+                password.getStyleClass().add("wrong-credentials");
+            }
         }
         else {
             username.getStyleClass().add("wrong-credentials");

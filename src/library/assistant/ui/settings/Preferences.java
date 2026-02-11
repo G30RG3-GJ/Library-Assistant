@@ -56,10 +56,16 @@ public class Preferences {
     }
 
     public void setPassword(String password) {
-        if (password.length() < 16) {
-            this.password = DigestUtils.shaHex(password);
-        }else
+        if (password.length() < 64) {
+            if (password.length() == 40) {
+                // Legacy SHA-1 hash, keep as is
+                this.password = password;
+            } else {
+                this.password = DigestUtils.sha256Hex(password);
+            }
+        } else {
             this.password = password;
+        }
     }
 
     public static void initConfig() {
@@ -92,23 +98,34 @@ public class Preferences {
         return preferences;
     }
 
-    public static void writePreferenceToFile(Preferences preference) {
+    private static void writeToFile(Preferences preference) throws IOException {
         Writer writer = null;
         try {
             Gson gson = new Gson();
             writer = new FileWriter(CONFIG_FILE);
             gson.toJson(preference, writer);
+        } finally {
+            if (writer != null) {
+                writer.close();
+            }
+        }
+    }
 
+    public static void writePreferenceToFile(Preferences preference) {
+        try {
+            writeToFile(preference);
             AlertMaker.showSimpleAlert("Success", "Settings updated");
         } catch (IOException ex) {
             Logger.getLogger(Preferences.class.getName()).log(Level.SEVERE, null, ex);
             AlertMaker.showErrorMessage(ex, "Failed", "Cant save configuration file");
-        } finally {
-            try {
-                writer.close();
-            } catch (IOException ex) {
-                Logger.getLogger(Preferences.class.getName()).log(Level.SEVERE, null, ex);
-            }
+        }
+    }
+
+    public static void writePreferenceToFileWithoutAlert(Preferences preference) {
+        try {
+            writeToFile(preference);
+        } catch (IOException ex) {
+            Logger.getLogger(Preferences.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

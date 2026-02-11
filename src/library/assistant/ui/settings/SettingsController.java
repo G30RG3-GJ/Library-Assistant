@@ -65,7 +65,11 @@ public class SettingsController implements Initializable {
         preferences.setnDaysWithoutFine(ndays);
         preferences.setFinePerDay(fine);
         preferences.setUsername(uname);
-        preferences.setPassword(pass);
+
+        String passHash = preferences.getPassword();
+        if (!pass.equals(passHash.substring(0, Math.min(passHash.length(), 10)))) {
+            preferences.setPassword(pass);
+        }
 
         Preferences.writePreferenceToFile(preferences);
     }
