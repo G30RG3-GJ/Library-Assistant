@@ -15,10 +15,10 @@ public class Preferences {
 
     public static final String CONFIG_FILE = "config.txt";
 
-    int nDaysWithoutFine;
-    float finePerDay;
-    String username;
-    String password;
+    private int nDaysWithoutFine;
+    private float finePerDay;
+    private String username;
+    private String password;
 
     public Preferences() {
         nDaysWithoutFine = 14;
