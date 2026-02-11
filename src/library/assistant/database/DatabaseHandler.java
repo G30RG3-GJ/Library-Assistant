@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicBoolean;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.chart.PieChart;
@@ -36,10 +38,23 @@ public final class DatabaseHandler {
     private static final String DB_URL = "jdbc:derby:database;create=true";
     private static Connection conn = null;
     private static Statement stmt = null;
+    private static final CountDownLatch latch = new CountDownLatch(1);
+    private static final AtomicBoolean initialized = new AtomicBoolean(false);
 
-    static {
-        createConnection();
-        inflateDB();
+    public static void init() {
+        if (initialized.compareAndSet(false, true)) {
+            createConnection();
+            inflateDB();
+            latch.countDown();
+        }
+    }
+
+    private static void waitForInit() {
+        try {
+            latch.await();
+        } catch (InterruptedException ex) {
+            LOGGER.log(Level.ERROR, "{}", ex);
+        }
     }
 
     private DatabaseHandler() {
@@ -59,7 +74,7 @@ public final class DatabaseHandler {
             System.out.println("Already loaded tables " + loadedTables);
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            Document doc = dBuilder.parse(DatabaseHandler.class.getClass().getResourceAsStream("/resources/database/tables.xml"));
+            Document doc = dBuilder.parse(DatabaseHandler.class.getResourceAsStream("/resources/database/tables.xml"));
             NodeList nList = doc.getElementsByTagName("table-entry");
             for (int i = 0; i < nList.getLength(); i++) {
                 Node nNode = nList.item(i);
@@ -111,6 +126,7 @@ public final class DatabaseHandler {
     public ResultSet execQuery(String query) {
         ResultSet result;
         try {
+            waitForInit();
             stmt = conn.createStatement();
             result = stmt.executeQuery(query);
         }
@@ -125,6 +141,7 @@ public final class DatabaseHandler {
 
     public boolean execAction(String qu) {
         try {
+            waitForInit();
             stmt = conn.createStatement();
             stmt.execute(qu);
             return true;
@@ -140,6 +157,7 @@ public final class DatabaseHandler {
 
     public boolean deleteBook(Book book) {
         try {
+            waitForInit();
             String deleteStatement = "DELETE FROM BOOK WHERE ID = ?";
             PreparedStatement stmt = conn.prepareStatement(deleteStatement);
             stmt.setString(1, book.getId());
@@ -156,6 +174,7 @@ public final class DatabaseHandler {
 
     public boolean isBookAlreadyIssued(Book book) {
         try {
+            waitForInit();
             String checkstmt = "SELECT COUNT(*) FROM ISSUE WHERE bookid=?";
             PreparedStatement stmt = conn.prepareStatement(checkstmt);
             stmt.setString(1, book.getId());
@@ -174,6 +193,7 @@ public final class DatabaseHandler {
 
     public boolean deleteMember(MemberListController.Member member) {
         try {
+            waitForInit();
             String deleteStatement = "DELETE FROM MEMBER WHERE id = ?";
             PreparedStatement stmt = conn.prepareStatement(deleteStatement);
             stmt.setString(1, member.getId());
@@ -190,6 +210,7 @@ public final class DatabaseHandler {
 
     public boolean isMemberHasAnyBooks(MemberListController.Member member) {
         try {
+            waitForInit();
             String checkstmt = "SELECT COUNT(*) FROM ISSUE WHERE memberID=?";
             PreparedStatement stmt = conn.prepareStatement(checkstmt);
             stmt.setString(1, member.getId());
@@ -208,6 +229,7 @@ public final class DatabaseHandler {
 
     public boolean updateBook(Book book) {
         try {
+            waitForInit();
             String update = "UPDATE BOOK SET TITLE=?, AUTHOR=?, PUBLISHER=? WHERE ID=?";
             PreparedStatement stmt = conn.prepareStatement(update);
             stmt.setString(1, book.getTitle());
@@ -225,6 +247,7 @@ public final class DatabaseHandler {
 
     public boolean updateMember(MemberListController.Member member) {
         try {
+            waitForInit();
             String update = "UPDATE MEMBER SET NAME=?, EMAIL=?, MOBILE=? WHERE ID=?";
             PreparedStatement stmt = conn.prepareStatement(update);
             stmt.setString(1, member.getName());
@@ -299,6 +322,7 @@ public final class DatabaseHandler {
     }
 
     public Connection getConnection() {
+        waitForInit();
         return conn;
     }
 }
