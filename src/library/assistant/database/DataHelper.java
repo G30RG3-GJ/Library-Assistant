@@ -7,6 +7,7 @@ import java.sql.Statement;
 import library.assistant.data.model.Book;
 import library.assistant.data.model.MailServerInfo;
 import library.assistant.ui.listmember.MemberListController.Member;
+import library.assistant.util.SecurityUtil;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -114,7 +115,7 @@ public class DataHelper {
             statement.setString(1, mailServerInfo.getMailServer());
             statement.setInt(2, mailServerInfo.getPort());
             statement.setString(3, mailServerInfo.getEmailID());
-            statement.setString(4, mailServerInfo.getPassword());
+            statement.setString(4, SecurityUtil.encrypt(mailServerInfo.getPassword()));
             statement.setBoolean(5, mailServerInfo.getSslEnabled());
             return statement.executeUpdate() > 0;
         } catch (SQLException ex) {
@@ -132,7 +133,7 @@ public class DataHelper {
                 String mailServer = rs.getString("server_name");
                 Integer port = rs.getInt("server_port");
                 String emailID = rs.getString("user_email");
-                String userPassword = rs.getString("user_password");
+                String userPassword = SecurityUtil.decrypt(rs.getString("user_password"));
                 Boolean sslEnabled = rs.getBoolean("ssl_enabled");
                 return new MailServerInfo(mailServer, port, emailID, userPassword, sslEnabled);
             }
