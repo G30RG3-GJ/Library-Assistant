@@ -1,5 +1,6 @@
 package library.assistant.ui.login;
 
+import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXTextField;
 import java.io.IOException;
@@ -29,27 +30,49 @@ public class LoginController implements Initializable {
     private JFXTextField username;
     @FXML
     private JFXPasswordField password;
+    @FXML
+    private JFXButton loginButton;
 
     Preferences preference;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         preference = Preferences.getPreferences();
+        if (preference.getUsername().isEmpty()) {
+            loginButton.setText("Create Account");
+        }
     }
 
     @FXML
     private void handleLoginButtonAction(ActionEvent event) {
         String uname = StringUtils.trimToEmpty(username.getText());
-        String pword = DigestUtils.shaHex(password.getText());
+        String pass = password.getText();
 
-        if (uname.equals(preference.getUsername()) && pword.equals(preference.getPassword())) {
+        if (preference.getUsername().isEmpty()) {
+            // Setup Mode
+            if (uname.isEmpty() || pass.isEmpty()) {
+                username.getStyleClass().add("wrong-credentials");
+                password.getStyleClass().add("wrong-credentials");
+                return;
+            }
+            preference.setUsername(uname);
+            preference.setPassword(pass);
+            Preferences.writePreferenceToFile(preference);
             closeStage();
             loadMain();
-            LOGGER.log(Level.INFO, "User successfully logged in {}", uname);
-        }
-        else {
-            username.getStyleClass().add("wrong-credentials");
-            password.getStyleClass().add("wrong-credentials");
+            LOGGER.log(Level.INFO, "User created and logged in: {}", uname);
+        } else {
+            // Login Mode
+            String pword = DigestUtils.shaHex(pass);
+
+            if (uname.equals(preference.getUsername()) && pword.equals(preference.getPassword())) {
+                closeStage();
+                loadMain();
+                LOGGER.log(Level.INFO, "User successfully logged in {}", uname);
+            } else {
+                username.getStyleClass().add("wrong-credentials");
+                password.getStyleClass().add("wrong-credentials");
+            }
         }
     }
 
