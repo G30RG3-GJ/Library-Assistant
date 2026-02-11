@@ -240,6 +240,20 @@ public final class DatabaseHandler {
         return false;
     }
 
+    public boolean renewBook(String bookID) {
+        try {
+            String update = "UPDATE ISSUE SET issueTime = CURRENT_TIMESTAMP, renew_count = renew_count+1 WHERE BOOKID = ?";
+            PreparedStatement stmt = conn.prepareStatement(update);
+            stmt.setString(1, bookID);
+            int res = stmt.executeUpdate();
+            return (res > 0);
+        }
+        catch (SQLException ex) {
+            LOGGER.log(Level.ERROR, "{}", ex);
+        }
+        return false;
+    }
+
     public static void main(String[] args) throws Exception {
         DatabaseHandler.getInstance();
     }

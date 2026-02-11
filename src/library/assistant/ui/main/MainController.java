@@ -364,9 +364,7 @@ public class MainController implements Initializable, BookReturnCallback {
         }
         JFXButton yesButton = new JFXButton("YES, Please");
         yesButton.addEventHandler(MouseEvent.MOUSE_CLICKED, (MouseEvent event1) -> {
-            String ac = "UPDATE ISSUE SET issueTime = CURRENT_TIMESTAMP, renew_count = renew_count+1 WHERE BOOKID = '" + bookID.getText() + "'";
-            System.out.println(ac);
-            if (databaseHandler.execAction(ac)) {
+            if (databaseHandler.renewBook(bookID.getText())) {
                 JFXButton btn = new JFXButton("Alright!");
                 AlertMaker.showMaterialDialog(rootPane, rootAnchorPane, Arrays.asList(btn), "Book Has Been Renewed", null);
                 disableEnableControls(false);
