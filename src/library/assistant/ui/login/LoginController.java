@@ -40,14 +40,42 @@ public class LoginController implements Initializable {
     @FXML
     private void handleLoginButtonAction(ActionEvent event) {
         String uname = StringUtils.trimToEmpty(username.getText());
-        String pword = DigestUtils.shaHex(password.getText());
+        String pword = password.getText();
 
-        if (uname.equals(preference.getUsername()) && pword.equals(preference.getPassword())) {
+        boolean passwordMatch = false;
+        String storedSalt = preference.getSalt();
+        String storedPassword = preference.getPassword();
+        boolean migrated = false;
+
+        if (storedSalt != null) {
+            String computedHash = Preferences.hashPassword(pword, storedSalt);
+            if (computedHash != null) {
+                passwordMatch = computedHash.equals(storedPassword);
+            }
+        } else {
+            // Legacy fallback (SHA-256 or SHA-1)
+            String sha256 = DigestUtils.sha256Hex(pword);
+            if (sha256.equals(storedPassword)) {
+                passwordMatch = true;
+                migrated = true;
+            } else {
+                String sha1 = DigestUtils.shaHex(pword);
+                if (sha1.equals(storedPassword)) {
+                    passwordMatch = true;
+                    migrated = true;
+                }
+            }
+        }
+
+        if (uname.equals(preference.getUsername()) && passwordMatch) {
+            if (migrated) {
+                preference.setPassword(pword);
+                Preferences.writePreferenceToFileWithoutAlert(preference);
+            }
             closeStage();
             loadMain();
             LOGGER.log(Level.INFO, "User successfully logged in {}", uname);
-        }
-        else {
+        } else {
             username.getStyleClass().add("wrong-credentials");
             password.getStyleClass().add("wrong-credentials");
         }
