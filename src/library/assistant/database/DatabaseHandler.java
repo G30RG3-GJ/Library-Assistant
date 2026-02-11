@@ -123,6 +123,25 @@ public final class DatabaseHandler {
         return result;
     }
 
+    public ResultSet execQuery(String query, Object... params) {
+        ResultSet result;
+        try {
+            PreparedStatement pstmt = conn.prepareStatement(query);
+            stmt = pstmt;
+            for (int i = 0; i < params.length; i++) {
+                pstmt.setObject(i + 1, params[i]);
+            }
+            result = pstmt.executeQuery();
+        }
+        catch (SQLException ex) {
+            System.out.println("Exception at execQuery:dataHandler" + ex.getLocalizedMessage());
+            return null;
+        }
+        finally {
+        }
+        return result;
+    }
+
     public boolean execAction(String qu) {
         try {
             stmt = conn.createStatement();
