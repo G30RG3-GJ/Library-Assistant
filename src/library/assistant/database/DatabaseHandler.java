@@ -123,10 +123,48 @@ public final class DatabaseHandler {
         return result;
     }
 
+    public ResultSet execQuery(String query, Object... params) {
+        ResultSet result;
+        try {
+            PreparedStatement ps = conn.prepareStatement(query);
+            for (int i = 0; i < params.length; i++) {
+                ps.setObject(i + 1, params[i]);
+            }
+            stmt = ps;
+            result = ps.executeQuery();
+        }
+        catch (SQLException ex) {
+            System.out.println("Exception at execQuery:dataHandler" + ex.getLocalizedMessage());
+            return null;
+        }
+        finally {
+        }
+        return result;
+    }
+
     public boolean execAction(String qu) {
         try {
             stmt = conn.createStatement();
             stmt.execute(qu);
+            return true;
+        }
+        catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, "Error:" + ex.getMessage(), "Error Occured", JOptionPane.ERROR_MESSAGE);
+            System.out.println("Exception at execQuery:dataHandler" + ex.getLocalizedMessage());
+            return false;
+        }
+        finally {
+        }
+    }
+
+    public boolean execAction(String qu, Object... params) {
+        try {
+            PreparedStatement ps = conn.prepareStatement(qu);
+            for (int i = 0; i < params.length; i++) {
+                ps.setObject(i + 1, params[i]);
+            }
+            stmt = ps;
+            ps.execute();
             return true;
         }
         catch (SQLException ex) {
