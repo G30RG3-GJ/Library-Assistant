@@ -13,6 +13,10 @@ import library.assistant.data.model.MailServerInfo;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author Villan
@@ -20,6 +24,16 @@ import org.apache.logging.log4j.Logger;
 public class EmailUtil {
 
     private final static Logger LOGGER = LogManager.getLogger(EmailUtil.class.getName());
+
+    private static final ExecutorService emailExecutor = Executors.newFixedThreadPool(10, new ThreadFactory() {
+        private final AtomicInteger count = new AtomicInteger(1);
+        @Override
+        public Thread newThread(Runnable r) {
+            Thread t = new Thread(r, "EMAIL-SENDER-" + count.getAndIncrement());
+            t.setDaemon(true);
+            return t;
+        }
+    });
 
     public static void sendTestMail(MailServerInfo mailServerInfo, String recepient, GenericCallback callback) {
 
@@ -59,8 +73,7 @@ public class EmailUtil {
                 callback.taskCompleted(Boolean.FALSE);
             }
         };
-        Thread mailSender = new Thread(emailSendTask, "EMAIL-SENDER");
-        mailSender.start();
+        emailExecutor.submit(emailSendTask);
     }
 
     public static void sendMail(MailServerInfo mailServerInfo, String recepient, String content, String title, GenericCallback callback) {
@@ -99,7 +112,6 @@ public class EmailUtil {
                 callback.taskCompleted(Boolean.FALSE);
             }
         };
-        Thread mailSender = new Thread(emailSendTask, "EMAIL-SENDER");
-        mailSender.start();
+        emailExecutor.submit(emailSendTask);
     }
 }
