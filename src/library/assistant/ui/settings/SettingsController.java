@@ -65,7 +65,9 @@ public class SettingsController implements Initializable {
         preferences.setnDaysWithoutFine(ndays);
         preferences.setFinePerDay(fine);
         preferences.setUsername(uname);
-        preferences.setPassword(pass);
+        if (!pass.isEmpty()) {
+            preferences.setPassword(pass);
+        }
 
         Preferences.writePreferenceToFile(preferences);
     }
@@ -79,8 +81,7 @@ public class SettingsController implements Initializable {
         nDaysWithoutFine.setText(String.valueOf(preferences.getnDaysWithoutFine()));
         finePerDay.setText(String.valueOf(preferences.getFinePerDay()));
         username.setText(String.valueOf(preferences.getUsername()));
-        String passHash = String.valueOf(preferences.getPassword());
-        password.setText(passHash.substring(0, Math.min(passHash.length(), 10)));
+        password.setText("");
         loadMailServerConfigurations();
     }
 
