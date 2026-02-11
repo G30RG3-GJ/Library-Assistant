@@ -5,11 +5,11 @@ package library.assistant.data.model;
  * @author afsal
  */
 public class Book {
-    String id;
-    String title;
-    String author;
-    String publisher;
-    Boolean isAvail;
+    private String id;
+    private String title;
+    private String author;
+    private String publisher;
+    private Boolean isAvail;
 
     public Book(String id, String title, String author, String publisher, Boolean isAvail) {
         this.id = id;
