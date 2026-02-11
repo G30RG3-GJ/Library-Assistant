@@ -35,7 +35,6 @@ public final class DatabaseHandler {
 
     private static final String DB_URL = "jdbc:derby:database;create=true";
     private static Connection conn = null;
-    private static Statement stmt = null;
 
     static {
         createConnection();
@@ -110,22 +109,28 @@ public final class DatabaseHandler {
 
     public ResultSet execQuery(String query) {
         ResultSet result;
+        Statement stmt = null;
         try {
             stmt = conn.createStatement();
             result = stmt.executeQuery(query);
+            stmt.closeOnCompletion();
         }
         catch (SQLException ex) {
             System.out.println("Exception at execQuery:dataHandler" + ex.getLocalizedMessage());
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    LOGGER.log(Level.ERROR, "{}", e);
+                }
+            }
             return null;
-        }
-        finally {
         }
         return result;
     }
 
     public boolean execAction(String qu) {
-        try {
-            stmt = conn.createStatement();
+        try (Statement stmt = conn.createStatement()) {
             stmt.execute(qu);
             return true;
         }
@@ -139,9 +144,8 @@ public final class DatabaseHandler {
     }
 
     public boolean deleteBook(Book book) {
-        try {
-            String deleteStatement = "DELETE FROM BOOK WHERE ID = ?";
-            PreparedStatement stmt = conn.prepareStatement(deleteStatement);
+        String deleteStatement = "DELETE FROM BOOK WHERE ID = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(deleteStatement)) {
             stmt.setString(1, book.getId());
             int res = stmt.executeUpdate();
             if (res == 1) {
@@ -155,9 +159,8 @@ public final class DatabaseHandler {
     }
 
     public boolean isBookAlreadyIssued(Book book) {
-        try {
-            String checkstmt = "SELECT COUNT(*) FROM ISSUE WHERE bookid=?";
-            PreparedStatement stmt = conn.prepareStatement(checkstmt);
+        String checkstmt = "SELECT COUNT(*) FROM ISSUE WHERE bookid=?";
+        try (PreparedStatement stmt = conn.prepareStatement(checkstmt)) {
             stmt.setString(1, book.getId());
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
@@ -173,9 +176,8 @@ public final class DatabaseHandler {
     }
 
     public boolean deleteMember(MemberListController.Member member) {
-        try {
-            String deleteStatement = "DELETE FROM MEMBER WHERE id = ?";
-            PreparedStatement stmt = conn.prepareStatement(deleteStatement);
+        String deleteStatement = "DELETE FROM MEMBER WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(deleteStatement)) {
             stmt.setString(1, member.getId());
             int res = stmt.executeUpdate();
             if (res == 1) {
@@ -189,9 +191,8 @@ public final class DatabaseHandler {
     }
 
     public boolean isMemberHasAnyBooks(MemberListController.Member member) {
-        try {
-            String checkstmt = "SELECT COUNT(*) FROM ISSUE WHERE memberID=?";
-            PreparedStatement stmt = conn.prepareStatement(checkstmt);
+        String checkstmt = "SELECT COUNT(*) FROM ISSUE WHERE memberID=?";
+        try (PreparedStatement stmt = conn.prepareStatement(checkstmt)) {
             stmt.setString(1, member.getId());
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
@@ -207,9 +208,8 @@ public final class DatabaseHandler {
     }
 
     public boolean updateBook(Book book) {
-        try {
-            String update = "UPDATE BOOK SET TITLE=?, AUTHOR=?, PUBLISHER=? WHERE ID=?";
-            PreparedStatement stmt = conn.prepareStatement(update);
+        String update = "UPDATE BOOK SET TITLE=?, AUTHOR=?, PUBLISHER=? WHERE ID=?";
+        try (PreparedStatement stmt = conn.prepareStatement(update)) {
             stmt.setString(1, book.getTitle());
             stmt.setString(2, book.getAuthor());
             stmt.setString(3, book.getPublisher());
@@ -224,9 +224,8 @@ public final class DatabaseHandler {
     }
 
     public boolean updateMember(MemberListController.Member member) {
-        try {
-            String update = "UPDATE MEMBER SET NAME=?, EMAIL=?, MOBILE=? WHERE ID=?";
-            PreparedStatement stmt = conn.prepareStatement(update);
+        String update = "UPDATE MEMBER SET NAME=?, EMAIL=?, MOBILE=? WHERE ID=?";
+        try (PreparedStatement stmt = conn.prepareStatement(update)) {
             stmt.setString(1, member.getName());
             stmt.setString(2, member.getEmail());
             stmt.setString(3, member.getMobile());
@@ -289,13 +288,13 @@ public final class DatabaseHandler {
     }
 
     private static void createTables(List<String> tableData) throws SQLException {
-        Statement statement = conn.createStatement();
-        statement.closeOnCompletion();
-        for (String command : tableData) {
-            System.out.println(command);
-            statement.addBatch(command);
+        try (Statement statement = conn.createStatement()) {
+            for (String command : tableData) {
+                System.out.println(command);
+                statement.addBatch(command);
+            }
+            statement.executeBatch();
         }
-        statement.executeBatch();
     }
 
     public Connection getConnection() {
