@@ -31,7 +31,7 @@ public class Main extends Application {
 
         new Thread(() -> {
             ExceptionUtil.init();
-            DatabaseHandler.getInstance();
+            DatabaseHandler.init();
         }).start();
     }
 
