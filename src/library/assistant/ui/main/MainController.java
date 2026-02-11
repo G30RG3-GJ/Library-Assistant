@@ -187,8 +187,8 @@ public class MainController implements Initializable, BookReturnCallback {
         enableDisableGraph(false);
 
         String id = memberIDInput.getText();
-        String qu = "SELECT * FROM MEMBER WHERE id = '" + id + "'";
-        ResultSet rs = databaseHandler.execQuery(qu);
+        String qu = "SELECT * FROM MEMBER WHERE id = ?";
+        ResultSet rs = databaseHandler.execQuery(qu, id);
         Boolean flag = false;
         try {
             while (rs.next()) {
@@ -281,8 +281,8 @@ public class MainController implements Initializable, BookReturnCallback {
                     + "ON ISSUE.memberID=MEMBER.ID\n"
                     + "LEFT JOIN BOOK\n"
                     + "ON ISSUE.bookID=BOOK.ID\n"
-                    + "WHERE ISSUE.bookID='" + id + "'";
-            ResultSet rs = databaseHandler.execQuery(myQuery);
+                    + "WHERE ISSUE.bookID=?";
+            ResultSet rs = databaseHandler.execQuery(myQuery, id);
             if (rs.next()) {
                 memberNameHolder.setText(rs.getString("name"));
                 memberContactHolder.setText(rs.getString("mobile"));
