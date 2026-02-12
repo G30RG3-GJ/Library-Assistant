@@ -63,52 +63,38 @@ public class Preferences {
     }
 
     public static void initConfig() {
-        Writer writer = null;
-        try {
+        try (Writer writer = new FileWriter(CONFIG_FILE)) {
             Preferences preference = new Preferences();
             Gson gson = new Gson();
-            writer = new FileWriter(CONFIG_FILE);
             gson.toJson(preference, writer);
         } catch (IOException ex) {
             Logger.getLogger(Preferences.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            try {
-                writer.close();
-            } catch (IOException ex) {
-                Logger.getLogger(Preferences.class.getName()).log(Level.SEVERE, null, ex);
-            }
         }
     }
 
     public static Preferences getPreferences() {
         Gson gson = new Gson();
         Preferences preferences = new Preferences();
-        try {
-            preferences = gson.fromJson(new FileReader(CONFIG_FILE), Preferences.class);
+        try (FileReader reader = new FileReader(CONFIG_FILE)) {
+            preferences = gson.fromJson(reader, Preferences.class);
         } catch (FileNotFoundException ex) {
             Logger.getLogger(Preferences.class.getName()).info("Config file is missing. Creating new one with default config");
             initConfig();
+        } catch (IOException ex) {
+            Logger.getLogger(Preferences.class.getName()).log(Level.SEVERE, null, ex);
         }
         return preferences;
     }
 
     public static void writePreferenceToFile(Preferences preference) {
-        Writer writer = null;
-        try {
+        try (Writer writer = new FileWriter(CONFIG_FILE)) {
             Gson gson = new Gson();
-            writer = new FileWriter(CONFIG_FILE);
             gson.toJson(preference, writer);
 
             AlertMaker.showSimpleAlert("Success", "Settings updated");
         } catch (IOException ex) {
             Logger.getLogger(Preferences.class.getName()).log(Level.SEVERE, null, ex);
             AlertMaker.showErrorMessage(ex, "Failed", "Cant save configuration file");
-        } finally {
-            try {
-                writer.close();
-            } catch (IOException ex) {
-                Logger.getLogger(Preferences.class.getName()).log(Level.SEVERE, null, ex);
-            }
         }
     }
 
