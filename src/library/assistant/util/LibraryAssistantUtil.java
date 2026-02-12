@@ -5,7 +5,9 @@ import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -31,8 +33,8 @@ public class LibraryAssistantUtil {
 
     public static final String ICON_IMAGE_LOC = "/resources/icon.png";
     public static final String MAIL_CONTENT_LOC = "/resources/mail_content.html";
-    private static final SimpleDateFormat DATE_TIME_FORMAT = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss a");
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd-MM-yyyy");
+    private static final DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm:ss a");
+    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
     public static void setStageIcon(Stage stage) {
         stage.getIcons().add(new Image(ICON_IMAGE_LOC));
@@ -94,15 +96,15 @@ public class LibraryAssistantUtil {
     }
 
     public static String formatDateTimeString(Date date) {
-        return DATE_TIME_FORMAT.format(date);
+        return DATE_TIME_FORMAT.format(Instant.ofEpochMilli(date.getTime()).atZone(ZoneId.systemDefault()));
     }
 
     public static String formatDateTimeString(Long time) {
-        return DATE_TIME_FORMAT.format(new Date(time));
+        return DATE_TIME_FORMAT.format(Instant.ofEpochMilli(time).atZone(ZoneId.systemDefault()));
     }
 
     public static String getDateString(Date date) {
-        return DATE_FORMAT.format(date);
+        return DATE_FORMAT.format(Instant.ofEpochMilli(date.getTime()).atZone(ZoneId.systemDefault()));
     }
 
     public static boolean validateEmailAddress(String emailID) {
