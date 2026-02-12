@@ -17,8 +17,8 @@ import javafx.scene.chart.PieChart;
 import javax.swing.JOptionPane;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import library.assistant.data.model.Member;
 import library.assistant.ui.listbook.BookListController.Book;
-import library.assistant.ui.listmember.MemberListController;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -172,7 +172,7 @@ public final class DatabaseHandler {
         return false;
     }
 
-    public boolean deleteMember(MemberListController.Member member) {
+    public boolean deleteMember(Member member) {
         try {
             String deleteStatement = "DELETE FROM MEMBER WHERE id = ?";
             PreparedStatement stmt = conn.prepareStatement(deleteStatement);
@@ -188,7 +188,7 @@ public final class DatabaseHandler {
         return false;
     }
 
-    public boolean isMemberHasAnyBooks(MemberListController.Member member) {
+    public boolean isMemberHasAnyBooks(Member member) {
         try {
             String checkstmt = "SELECT COUNT(*) FROM ISSUE WHERE memberID=?";
             PreparedStatement stmt = conn.prepareStatement(checkstmt);
@@ -223,7 +223,7 @@ public final class DatabaseHandler {
         return false;
     }
 
-    public boolean updateMember(MemberListController.Member member) {
+    public boolean updateMember(Member member) {
         try {
             String update = "UPDATE MEMBER SET NAME=?, EMAIL=?, MOBILE=? WHERE ID=?";
             PreparedStatement stmt = conn.prepareStatement(update);
