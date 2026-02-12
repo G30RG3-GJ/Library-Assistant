@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -81,7 +80,7 @@ public class LibraryAssistantUtil {
         boolean flag = ltp.doPrintToPdf(data, saveLoc, ListToPDF.Orientation.LANDSCAPE);
         JFXButton okayBtn = new JFXButton("Okay");
         JFXButton openBtn = new JFXButton("View File");
-        openBtn.setOnAction((ActionEvent event1) -> {
+        openBtn.setOnAction((event1) -> {
             try {
                 Desktop.getDesktop().open(saveLoc);
             } catch (Exception exp) {
