@@ -85,7 +85,7 @@ public final class DatabaseHandler {
 
     private static void createConnection() {
         try {
-            Class.forName("org.apache.derby.jdbc.EmbeddedDriver").newInstance();
+            Class.forName("org.apache.derby.jdbc.EmbeddedDriver").getDeclaredConstructor().newInstance();
             conn = DriverManager.getConnection(DB_URL);
         }
         catch (Exception e) {
