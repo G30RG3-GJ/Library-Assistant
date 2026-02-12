@@ -35,7 +35,6 @@ public final class DatabaseHandler {
 
     private static final String DB_URL = "jdbc:derby:database;create=true";
     private static Connection conn = null;
-    private static Statement stmt = null;
 
     static {
         createConnection();
@@ -108,33 +107,54 @@ public final class DatabaseHandler {
         }
     }
 
-    public ResultSet execQuery(String query) {
+
+    public ResultSet execQuery(String query, Object... params) {
         ResultSet result;
+        PreparedStatement pstmt = null;
         try {
-            stmt = conn.createStatement();
-            result = stmt.executeQuery(query);
+            pstmt = conn.prepareStatement(query);
+            for (int i = 0; i < params.length; i++) {
+                pstmt.setObject(i + 1, params[i]);
+            }
+            pstmt.closeOnCompletion();
+            result = pstmt.executeQuery();
         }
         catch (SQLException ex) {
             System.out.println("Exception at execQuery:dataHandler" + ex.getLocalizedMessage());
+            if (pstmt != null) {
+                try {
+                    pstmt.close();
+                } catch (SQLException e) {
+                    LOGGER.log(Level.ERROR, "{}", e);
+                }
+            }
             return null;
-        }
-        finally {
         }
         return result;
     }
 
-    public boolean execAction(String qu) {
+    public boolean execAction(String query, Object... params) {
+        PreparedStatement pstmt = null;
         try {
-            stmt = conn.createStatement();
-            stmt.execute(qu);
+            pstmt = conn.prepareStatement(query);
+            for (int i = 0; i < params.length; i++) {
+                pstmt.setObject(i + 1, params[i]);
+            }
+            pstmt.execute();
             return true;
         }
         catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, "Error:" + ex.getMessage(), "Error Occured", JOptionPane.ERROR_MESSAGE);
             System.out.println("Exception at execQuery:dataHandler" + ex.getLocalizedMessage());
             return false;
-        }
-        finally {
+        } finally {
+            if (pstmt != null) {
+                try {
+                    pstmt.close();
+                } catch (SQLException ex) {
+                    LOGGER.log(Level.ERROR, "{}", ex);
+                }
+            }
         }
     }
 
