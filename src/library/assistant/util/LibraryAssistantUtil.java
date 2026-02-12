@@ -62,12 +62,7 @@ public class LibraryAssistantUtil {
 
     public static Float getFineAmount(int totalDays) {
         Preferences pref = Preferences.getPreferences();
-        Integer fineDays = totalDays - pref.getnDaysWithoutFine();
-        Float fine = 0f;
-        if (fineDays > 0) {
-            fine = fineDays * pref.getFinePerDay();
-        }
-        return fine;
+        return FineCalculator.calculateFine(totalDays, pref.getnDaysWithoutFine(), pref.getFinePerDay());
     }
 
     public static void initPDFExprot(StackPane rootPane, Node contentPane, Stage stage, List<List> data) {
