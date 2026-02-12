@@ -172,7 +172,7 @@ public class MemberListController implements Initializable {
             row.add(member.getEmail());
             printData.add(row);
         }
-        LibraryAssistantUtil.initPDFExprot(rootPane, contentPane, getStage(), printData);
+        LibraryAssistantUtil.initPDFExport(rootPane, contentPane, getStage(), printData);
     }
 
     @FXML

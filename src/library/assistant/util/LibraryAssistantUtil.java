@@ -70,7 +70,7 @@ public class LibraryAssistantUtil {
         return fine;
     }
 
-    public static void initPDFExprot(StackPane rootPane, Node contentPane, Stage stage, List<List> data) {
+    public static void initPDFExport(StackPane rootPane, Node contentPane, Stage stage, List<List> data) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Save as PDF");
         FileChooser.ExtensionFilter extFilter

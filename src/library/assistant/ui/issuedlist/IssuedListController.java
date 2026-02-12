@@ -129,7 +129,7 @@ public class IssuedListController implements Initializable {
             row.add(String.valueOf(info.getFine()));
             printData.add(row);
         }
-        LibraryAssistantUtil.initPDFExprot(rootPane, contentPane, getStage(), printData);
+        LibraryAssistantUtil.initPDFExport(rootPane, contentPane, getStage(), printData);
     }
 
     @FXML

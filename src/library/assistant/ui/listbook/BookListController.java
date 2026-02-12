@@ -176,7 +176,7 @@ public class BookListController implements Initializable {
             row.add(book.getAvailabilty());
             printData.add(row);
         }
-        LibraryAssistantUtil.initPDFExprot(rootPane, contentPane, getStage(), printData);
+        LibraryAssistantUtil.initPDFExport(rootPane, contentPane, getStage(), printData);
     }
 
     @FXML
