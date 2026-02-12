@@ -30,6 +30,7 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import library.assistant.alert.AlertMaker;
+import library.assistant.data.model.Book;
 import library.assistant.database.DatabaseHandler;
 import library.assistant.ui.addbook.BookAddController;
 import library.assistant.ui.main.MainController;
@@ -52,7 +53,7 @@ public class BookListController implements Initializable {
     @FXML
     private TableColumn<Book, String> publisherCol;
     @FXML
-    private TableColumn<Book, Boolean> availabilityCol;
+    private TableColumn<Book, String> availabilityCol;
     @FXML
     private AnchorPane contentPane;
 
@@ -71,7 +72,10 @@ public class BookListController implements Initializable {
         idCol.setCellValueFactory(new PropertyValueFactory<>("id"));
         authorCol.setCellValueFactory(new PropertyValueFactory<>("author"));
         publisherCol.setCellValueFactory(new PropertyValueFactory<>("publisher"));
-        availabilityCol.setCellValueFactory(new PropertyValueFactory<>("availabilty"));
+        availabilityCol.setCellValueFactory(cellData -> {
+            boolean avail = cellData.getValue().getAvailability();
+            return new SimpleStringProperty(avail ? "Available" : "Issued");
+        });
     }
 
     private void loadData() {
@@ -88,7 +92,7 @@ public class BookListController implements Initializable {
                 String publisher = rs.getString("publisher");
                 Boolean avail = rs.getBoolean("isAvail");
 
-                list.add(new Book(titlex, id, author, publisher, avail));
+                list.add(new Book(id, titlex, author, publisher, avail));
 
             }
         } catch (SQLException ex) {
@@ -173,7 +177,7 @@ public class BookListController implements Initializable {
             row.add(book.getId());
             row.add(book.getAuthor());
             row.add(book.getPublisher());
-            row.add(book.getAvailabilty());
+            row.add(book.getAvailability() ? "Available" : "Issued");
             printData.add(row);
         }
         LibraryAssistantUtil.initPDFExprot(rootPane, contentPane, getStage(), printData);
@@ -183,47 +187,4 @@ public class BookListController implements Initializable {
     private void closeStage(ActionEvent event) {
         getStage().close();
     }
-
-    public static class Book {
-
-        private final SimpleStringProperty title;
-        private final SimpleStringProperty id;
-        private final SimpleStringProperty author;
-        private final SimpleStringProperty publisher;
-        private final SimpleStringProperty availabilty;
-
-        public Book(String title, String id, String author, String pub, Boolean avail) {
-            this.title = new SimpleStringProperty(title);
-            this.id = new SimpleStringProperty(id);
-            this.author = new SimpleStringProperty(author);
-            this.publisher = new SimpleStringProperty(pub);
-            if (avail) {
-                this.availabilty = new SimpleStringProperty("Available");
-            } else {
-                this.availabilty = new SimpleStringProperty("Issued");
-            }
-        }
-
-        public String getTitle() {
-            return title.get();
-        }
-
-        public String getId() {
-            return id.get();
-        }
-
-        public String getAuthor() {
-            return author.get();
-        }
-
-        public String getPublisher() {
-            return publisher.get();
-        }
-
-        public String getAvailabilty() {
-            return availabilty.get();
-        }
-
-    }
-
 }

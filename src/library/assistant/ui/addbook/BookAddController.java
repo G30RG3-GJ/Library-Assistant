@@ -19,7 +19,6 @@ import library.assistant.alert.AlertMaker;
 import library.assistant.data.model.Book;
 import library.assistant.database.DataHelper;
 import library.assistant.database.DatabaseHandler;
-import library.assistant.ui.listbook.BookListController;
 import org.apache.commons.lang3.StringUtils;
 
 public class BookAddController implements Initializable {
@@ -100,7 +99,7 @@ public class BookAddController implements Initializable {
         }
     }
 
-    public void inflateUI(BookListController.Book book) {
+    public void inflateUI(Book book) {
         title.setText(book.getTitle());
         id.setText(book.getId());
         author.setText(book.getAuthor());
@@ -117,7 +116,7 @@ public class BookAddController implements Initializable {
     }
 
     private void handleEditOperation() {
-        BookListController.Book book = new BookListController.Book(title.getText(), id.getText(), author.getText(), publisher.getText(), true);
+        Book book = new Book(id.getText(), title.getText(), author.getText(), publisher.getText(), true);
         if (databaseHandler.updateBook(book)) {
             AlertMaker.showMaterialDialog(rootPane, mainContainer, new ArrayList<>(), "Success", "Update complete");
         } else {

@@ -17,7 +17,7 @@ import javafx.scene.chart.PieChart;
 import javax.swing.JOptionPane;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import library.assistant.ui.listbook.BookListController.Book;
+import library.assistant.data.model.Book;
 import library.assistant.ui.listmember.MemberListController;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
