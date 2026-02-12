@@ -85,7 +85,7 @@ public class MemberAddController implements Initializable {
         }
     }
 
-    public void infalteUI(MemberListController.Member member) {
+    public void inflateUI(MemberListController.Member member) {
         name.setText(member.getName());
         id.setText(member.getId());
         id.setEditable(false);
