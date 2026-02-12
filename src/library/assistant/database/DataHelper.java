@@ -6,7 +6,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import library.assistant.data.model.Book;
 import library.assistant.data.model.MailServerInfo;
-import library.assistant.ui.listmember.MemberListController.Member;
+import library.assistant.data.model.Member;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

@@ -11,7 +11,6 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -31,6 +30,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import library.assistant.alert.AlertMaker;
 import library.assistant.database.DatabaseHandler;
+import library.assistant.data.model.Member;
 import library.assistant.ui.addbook.BookAddController;
 import library.assistant.ui.addmember.MemberAddController;
 import library.assistant.ui.main.MainController;
@@ -85,7 +85,7 @@ public class MemberListController implements Initializable {
                 String id = rs.getString("id");
                 String email = rs.getString("email");
 
-                list.add(new Member(name, id, mobile, email));
+                list.add(new Member(id, name, email, mobile));
 
             }
         } catch (SQLException ex) {
@@ -98,7 +98,7 @@ public class MemberListController implements Initializable {
     @FXML
     private void handleMemberDelete(ActionEvent event) {
         //Fetch the selected row
-        MemberListController.Member selectedForDeletion = tableView.getSelectionModel().getSelectedItem();
+        Member selectedForDeletion = tableView.getSelectionModel().getSelectedItem();
         if (selectedForDeletion == null) {
             AlertMaker.showErrorMessage("No member selected", "Please select a member for deletion.");
             return;
@@ -178,38 +178,6 @@ public class MemberListController implements Initializable {
     @FXML
     private void closeStage(ActionEvent event) {
         getStage().close();
-    }
-
-    public static class Member {
-
-        private final SimpleStringProperty name;
-        private final SimpleStringProperty id;
-        private final SimpleStringProperty mobile;
-        private final SimpleStringProperty email;
-
-        public Member(String name, String id, String mobile, String email) {
-            this.name = new SimpleStringProperty(name);
-            this.id = new SimpleStringProperty(id);
-            this.mobile = new SimpleStringProperty(mobile);
-            this.email = new SimpleStringProperty(email);
-        }
-
-        public String getName() {
-            return name.get();
-        }
-
-        public String getId() {
-            return id.get();
-        }
-
-        public String getMobile() {
-            return mobile.get();
-        }
-
-        public String getEmail() {
-            return email.get();
-        }
-
     }
 
 }
