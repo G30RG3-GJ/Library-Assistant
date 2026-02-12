@@ -1,10 +1,18 @@
 package library.assistant.encryption;
 
+import com.google.gson.Gson;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.InvalidClassException;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.ObjectStreamClass;
+import java.io.PushbackInputStream;
+import java.io.Reader;
+import java.io.Writer;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.concurrent.locks.Lock;
@@ -121,15 +129,16 @@ public class EncryptionUtil {
     }
 
     private static void writeKey(CipherSpec spec) throws Exception {
-        KEY_STORE.mkdirs();
+        File parent = KEY_STORE.getParentFile();
+        if (parent != null) {
+            parent.mkdirs();
+        }
         if (KEY_STORE.exists()) {
             LOGGER.log(Level.INFO, "Clearing existing encryption info");
             KEY_STORE.delete();
-        } else {
-            KEY_STORE.createNewFile();
         }
-        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(KEY_STORE, false))) {
-            out.writeObject(spec);
+        try (Writer writer = new FileWriter(KEY_STORE)) {
+            new Gson().toJson(spec, writer);
         }
         if (KEY_STORE.exists()) {
             LOGGER.log(Level.INFO, "Added new encryption setup");
@@ -137,11 +146,52 @@ public class EncryptionUtil {
     }
 
     private static CipherSpec getCipherSpec() throws Exception {
+        CipherSpec spec = null;
+        boolean isLegacy = false;
+
         if (KEY_STORE.exists()) {
-            try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(KEY_STORE))) {
-                return (CipherSpec) in.readObject();
+            try (PushbackInputStream pis = new PushbackInputStream(new FileInputStream(KEY_STORE), 2)) {
+                byte[] header = new byte[2];
+                int len = pis.read(header);
+                if (len < 2) {
+                    return null;
+                }
+                pis.unread(header, 0, len);
+
+                if (header[0] == (byte) 0xAC && header[1] == (byte) 0xED) {
+                    // Legacy
+                    try (ObjectInputStream in = new LookAheadObjectInputStream(pis)) {
+                        spec = (CipherSpec) in.readObject();
+                        isLegacy = true;
+                    }
+                } else {
+                    // Assume JSON
+                    try (Reader reader = new InputStreamReader(pis)) {
+                        spec = new Gson().fromJson(reader, CipherSpec.class);
+                    }
+                }
             }
         }
-        return null;
+
+        if (isLegacy && spec != null) {
+            writeKey(spec); // Migrate
+        }
+
+        return spec;
+    }
+
+    private static class LookAheadObjectInputStream extends ObjectInputStream {
+
+        public LookAheadObjectInputStream(InputStream inputStream) throws IOException {
+            super(inputStream);
+        }
+
+        @Override
+        protected Class<?> resolveClass(ObjectStreamClass desc) throws IOException, ClassNotFoundException {
+            if (!desc.getName().equals(CipherSpec.class.getName()) && !desc.getName().equals("[B")) {
+                throw new InvalidClassException("Unauthorized deserialization attempt", desc.getName());
+            }
+            return super.resolveClass(desc);
+        }
     }
 }
