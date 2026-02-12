@@ -139,19 +139,8 @@ public final class DatabaseHandler {
     }
 
     public boolean deleteBook(Book book) {
-        try {
-            String deleteStatement = "DELETE FROM BOOK WHERE ID = ?";
-            PreparedStatement stmt = conn.prepareStatement(deleteStatement);
-            stmt.setString(1, book.getId());
-            int res = stmt.executeUpdate();
-            if (res == 1) {
-                return true;
-            }
-        }
-        catch (SQLException ex) {
-            LOGGER.log(Level.ERROR, "{}", ex);
-        }
-        return false;
+        String deleteStatement = "DELETE FROM BOOK WHERE ID = ?";
+        return execUpdate(deleteStatement, book.getId());
     }
 
     public boolean isBookAlreadyIssued(Book book) {
@@ -173,19 +162,8 @@ public final class DatabaseHandler {
     }
 
     public boolean deleteMember(MemberListController.Member member) {
-        try {
-            String deleteStatement = "DELETE FROM MEMBER WHERE id = ?";
-            PreparedStatement stmt = conn.prepareStatement(deleteStatement);
-            stmt.setString(1, member.getId());
-            int res = stmt.executeUpdate();
-            if (res == 1) {
-                return true;
-            }
-        }
-        catch (SQLException ex) {
-            LOGGER.log(Level.ERROR, "{}", ex);
-        }
-        return false;
+        String deleteStatement = "DELETE FROM MEMBER WHERE id = ?";
+        return execUpdate(deleteStatement, member.getId());
     }
 
     public boolean isMemberHasAnyBooks(MemberListController.Member member) {
@@ -207,37 +185,26 @@ public final class DatabaseHandler {
     }
 
     public boolean updateBook(Book book) {
-        try {
-            String update = "UPDATE BOOK SET TITLE=?, AUTHOR=?, PUBLISHER=? WHERE ID=?";
-            PreparedStatement stmt = conn.prepareStatement(update);
-            stmt.setString(1, book.getTitle());
-            stmt.setString(2, book.getAuthor());
-            stmt.setString(3, book.getPublisher());
-            stmt.setString(4, book.getId());
-            int res = stmt.executeUpdate();
-            return (res > 0);
-        }
-        catch (SQLException ex) {
-            LOGGER.log(Level.ERROR, "{}", ex);
-        }
-        return false;
+        String update = "UPDATE BOOK SET TITLE=?, AUTHOR=?, PUBLISHER=? WHERE ID=?";
+        return execUpdate(update, book.getTitle(), book.getAuthor(), book.getPublisher(), book.getId());
     }
 
     public boolean updateMember(MemberListController.Member member) {
-        try {
-            String update = "UPDATE MEMBER SET NAME=?, EMAIL=?, MOBILE=? WHERE ID=?";
-            PreparedStatement stmt = conn.prepareStatement(update);
-            stmt.setString(1, member.getName());
-            stmt.setString(2, member.getEmail());
-            stmt.setString(3, member.getMobile());
-            stmt.setString(4, member.getId());
+        String update = "UPDATE MEMBER SET NAME=?, EMAIL=?, MOBILE=? WHERE ID=?";
+        return execUpdate(update, member.getName(), member.getEmail(), member.getMobile(), member.getId());
+    }
+
+    public boolean execUpdate(String query, Object... params) {
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            for (int i = 0; i < params.length; i++) {
+                stmt.setObject(i + 1, params[i]);
+            }
             int res = stmt.executeUpdate();
-            return (res > 0);
-        }
-        catch (SQLException ex) {
+            return res > 0;
+        } catch (SQLException ex) {
             LOGGER.log(Level.ERROR, "{}", ex);
+            return false;
         }
-        return false;
     }
 
     public static void main(String[] args) throws Exception {
