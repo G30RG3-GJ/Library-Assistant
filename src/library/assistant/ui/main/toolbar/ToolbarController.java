@@ -8,8 +8,13 @@ import javafx.fxml.Initializable;
 import library.assistant.ui.callback.BookReturnCallback;
 import library.assistant.ui.issuedlist.IssuedListController;
 import library.assistant.util.LibraryAssistantUtil;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class ToolbarController implements Initializable {
+
+    private final static Logger LOGGER = LogManager.getLogger(ToolbarController.class.getName());
 
     private BookReturnCallback callback;
 
@@ -19,7 +24,7 @@ public class ToolbarController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // TODO
+        LOGGER.log(Level.INFO, "Toolbar Initialized");
     }
 
     @FXML
