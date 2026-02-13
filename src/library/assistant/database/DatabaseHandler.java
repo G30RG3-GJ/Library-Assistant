@@ -14,7 +14,6 @@ import java.util.Set;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.chart.PieChart;
-import javax.swing.JOptionPane;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import library.assistant.ui.listbook.BookListController.Book;
@@ -37,12 +36,9 @@ public final class DatabaseHandler {
     private static Connection conn = null;
     private static Statement stmt = null;
 
-    static {
+    private DatabaseHandler() {
         createConnection();
         inflateDB();
-    }
-
-    private DatabaseHandler() {
     }
 
     public static DatabaseHandler getInstance() {
@@ -59,7 +55,7 @@ public final class DatabaseHandler {
             System.out.println("Already loaded tables " + loadedTables);
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            Document doc = dBuilder.parse(DatabaseHandler.class.getClass().getResourceAsStream("/resources/database/tables.xml"));
+            Document doc = dBuilder.parse(DatabaseHandler.class.getResourceAsStream("/resources/database/tables.xml"));
             NodeList nList = doc.getElementsByTagName("table-entry");
             for (int i = 0; i < nList.getLength(); i++) {
                 Node nNode = nList.item(i);
@@ -85,12 +81,12 @@ public final class DatabaseHandler {
 
     private static void createConnection() {
         try {
-            Class.forName("org.apache.derby.jdbc.EmbeddedDriver").newInstance();
+            Class.forName("org.apache.derby.jdbc.EmbeddedDriver").getDeclaredConstructor().newInstance();
             conn = DriverManager.getConnection(DB_URL);
         }
         catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Cant load database", "Database Error", JOptionPane.ERROR_MESSAGE);
-            System.exit(0);
+            LOGGER.log(Level.ERROR, "{}", e);
+            throw new RuntimeException("Database Connection Failed", e);
         }
     }
 
@@ -130,7 +126,7 @@ public final class DatabaseHandler {
             return true;
         }
         catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, "Error:" + ex.getMessage(), "Error Occured", JOptionPane.ERROR_MESSAGE);
+            LOGGER.log(Level.ERROR, "{}", ex);
             System.out.println("Exception at execQuery:dataHandler" + ex.getLocalizedMessage());
             return false;
         }
@@ -238,10 +234,6 @@ public final class DatabaseHandler {
             LOGGER.log(Level.ERROR, "{}", ex);
         }
         return false;
-    }
-
-    public static void main(String[] args) throws Exception {
-        DatabaseHandler.getInstance();
     }
 
     public ObservableList<PieChart.Data> getBookGraphStatistics() {
