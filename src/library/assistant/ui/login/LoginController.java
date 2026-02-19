@@ -1,5 +1,6 @@
 package library.assistant.ui.login;
 
+import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXTextField;
 import java.io.IOException;
@@ -11,6 +12,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import library.assistant.ui.settings.Preferences;
@@ -29,12 +31,20 @@ public class LoginController implements Initializable {
     private JFXTextField username;
     @FXML
     private JFXPasswordField password;
+    @FXML
+    private JFXButton loginButton;
+    @FXML
+    private Label titleLabel;
 
     Preferences preference;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         preference = Preferences.getPreferences();
+        if (preference.getUsername() == null || preference.getUsername().isEmpty()) {
+            titleLabel.setText("First Run: Create Admin Account");
+            loginButton.setText("Save");
+        }
     }
 
     @FXML
@@ -42,14 +52,26 @@ public class LoginController implements Initializable {
         String uname = StringUtils.trimToEmpty(username.getText());
         String pword = DigestUtils.shaHex(password.getText());
 
-        if (uname.equals(preference.getUsername()) && pword.equals(preference.getPassword())) {
+        if (preference.getUsername() == null || preference.getUsername().isEmpty()) {
+            if (uname.isEmpty() || password.getText().isEmpty()) {
+                titleLabel.setText("Please enter username and password");
+                return;
+            }
+            preference.setUsername(uname);
+            preference.setPassword(pword);
+            Preferences.writePreferenceToFile(preference);
             closeStage();
             loadMain();
-            LOGGER.log(Level.INFO, "User successfully logged in {}", uname);
-        }
-        else {
-            username.getStyleClass().add("wrong-credentials");
-            password.getStyleClass().add("wrong-credentials");
+            LOGGER.log(Level.INFO, "Admin account created and logged in: {}", uname);
+        } else {
+            if (uname.equals(preference.getUsername()) && pword.equals(preference.getPassword())) {
+                closeStage();
+                loadMain();
+                LOGGER.log(Level.INFO, "User successfully logged in {}", uname);
+            } else {
+                username.getStyleClass().add("wrong-credentials");
+                password.getStyleClass().add("wrong-credentials");
+            }
         }
     }
 
