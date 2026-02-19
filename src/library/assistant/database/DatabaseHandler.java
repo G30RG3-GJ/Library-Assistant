@@ -59,7 +59,7 @@ public final class DatabaseHandler {
             System.out.println("Already loaded tables " + loadedTables);
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            Document doc = dBuilder.parse(DatabaseHandler.class.getClass().getResourceAsStream("/resources/database/tables.xml"));
+            Document doc = dBuilder.parse(DatabaseHandler.class.getResourceAsStream("/resources/database/tables.xml"));
             NodeList nList = doc.getElementsByTagName("table-entry");
             for (int i = 0; i < nList.getLength(); i++) {
                 Node nNode = nList.item(i);
@@ -89,7 +89,7 @@ public final class DatabaseHandler {
             conn = DriverManager.getConnection(DB_URL);
         }
         catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Cant load database", "Database Error", JOptionPane.ERROR_MESSAGE);
+            LOGGER.log(Level.ERROR, "Cant load database", e);
             System.exit(0);
         }
     }
@@ -123,6 +123,22 @@ public final class DatabaseHandler {
         return result;
     }
 
+    public ResultSet execQuery(String query, Object... params) {
+        ResultSet result;
+        try {
+            PreparedStatement pstmt = conn.prepareStatement(query);
+            for (int i = 0; i < params.length; i++) {
+                pstmt.setObject(i + 1, params[i]);
+            }
+            result = pstmt.executeQuery();
+        }
+        catch (SQLException ex) {
+            LOGGER.log(Level.ERROR, "Exception at execQuery:dataHandler", ex);
+            return null;
+        }
+        return result;
+    }
+
     public boolean execAction(String qu) {
         try {
             stmt = conn.createStatement();
@@ -130,7 +146,7 @@ public final class DatabaseHandler {
             return true;
         }
         catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, "Error:" + ex.getMessage(), "Error Occured", JOptionPane.ERROR_MESSAGE);
+            LOGGER.log(Level.ERROR, "Error:" + ex.getMessage(), ex);
             System.out.println("Exception at execQuery:dataHandler" + ex.getLocalizedMessage());
             return false;
         }
