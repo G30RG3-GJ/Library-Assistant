@@ -8,6 +8,8 @@ javac -sourcepath "" -cp "libs/*:libs/test/*:build/test/stubs" -d build/test/cla
 src/library/assistant/data/model/Book.java \
 src/library/assistant/data/model/MailServerInfo.java \
 src/library/assistant/database/DataHelper.java \
-test/library/assistant/database/DataHelperTest.java
+test/library/assistant/database/DataHelperTest.java \
+src/library/assistant/util/EmailValidator.java \
+test/library/assistant/util/EmailValidatorTest.java
 
-java -cp "build/test/classes:build/test/stubs:libs/*:libs/test/*" org.junit.runner.JUnitCore library.assistant.database.DataHelperTest
+java -cp "build/test/classes:build/test/stubs:libs/*:libs/test/*" org.junit.runner.JUnitCore library.assistant.database.DataHelperTest library.assistant.util.EmailValidatorTest
