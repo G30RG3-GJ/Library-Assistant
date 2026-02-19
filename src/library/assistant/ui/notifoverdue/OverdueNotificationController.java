@@ -8,10 +8,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import javafx.concurrent.Task;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -87,37 +89,48 @@ public class OverdueNotificationController implements Initializable {
 
         Preferences pref = Preferences.getPreferences();
         Long overdueBegin = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(pref.getnDaysWithoutFine());
-
         DatabaseHandler handler = DatabaseHandler.getInstance();
-        String qu = "SELECT ISSUE.bookID, ISSUE.memberID, ISSUE.issueTime, MEMBER.name, MEMBER.id, MEMBER.email, BOOK.title FROM ISSUE\n"
-                + "LEFT OUTER JOIN MEMBER\n"
-                + "ON MEMBER.id = ISSUE.memberID\n"
-                + "LEFT OUTER JOIN BOOK\n"
-                + "ON BOOK.id = ISSUE.bookID\n"
-                + "WHERE ISSUE.issueTime < ?";
-        try {
-            PreparedStatement statement = handler.getConnection().prepareStatement(qu);
-            statement.setTimestamp(1, new Timestamp(overdueBegin));
-            ResultSet rs = statement.executeQuery();
-            int counter = 0;
-            while (rs.next()) {
-                counter += 1;
-                String memberName = rs.getString("name");
-                String memberID = rs.getString("id");
-                String email = rs.getString("email");
-                String bookID = rs.getString("bookID");
-                String bookTitle = rs.getString("title");
-                Timestamp issueTime = rs.getTimestamp("issueTime");
-                System.out.println("Issued on " + issueTime);
-                Integer days = Math.toIntExact(TimeUnit.MILLISECONDS.toDays(System.currentTimeMillis() - issueTime.getTime())) + 1;
-                Float fine = LibraryAssistantUtil.getFineAmount(days);
 
-                NotificationItem item = new NotificationItem(true, memberID, memberName, email, bookTitle, LibraryAssistantUtil.getDateString(issueTime), days, fine);
-                list.add(item);
+        Task<List<NotificationItem>> task = new Task<List<NotificationItem>>() {
+            @Override
+            protected List<NotificationItem> call() throws Exception {
+                List<NotificationItem> notificationList = new ArrayList<>();
+                String qu = "SELECT ISSUE.bookID, ISSUE.memberID, ISSUE.issueTime, MEMBER.name, MEMBER.id, MEMBER.email, BOOK.title FROM ISSUE\n"
+                        + "LEFT OUTER JOIN MEMBER\n"
+                        + "ON MEMBER.id = ISSUE.memberID\n"
+                        + "LEFT OUTER JOIN BOOK\n"
+                        + "ON BOOK.id = ISSUE.bookID\n"
+                        + "WHERE ISSUE.issueTime < ?";
+                try {
+                    PreparedStatement statement = handler.getConnection().prepareStatement(qu);
+                    statement.setTimestamp(1, new Timestamp(overdueBegin));
+                    ResultSet rs = statement.executeQuery();
+                    while (rs.next()) {
+                        String memberName = rs.getString("name");
+                        String memberID = rs.getString("id");
+                        String email = rs.getString("email");
+                        String bookID = rs.getString("bookID");
+                        String bookTitle = rs.getString("title");
+                        Timestamp issueTime = rs.getTimestamp("issueTime");
+                        System.out.println("Issued on " + issueTime);
+                        Integer days = Math.toIntExact(TimeUnit.MILLISECONDS.toDays(System.currentTimeMillis() - issueTime.getTime())) + 1;
+                        Float fine = LibraryAssistantUtil.getFineAmount(days);
+
+                        NotificationItem item = new NotificationItem(true, memberID, memberName, email, bookTitle, LibraryAssistantUtil.getDateString(issueTime), days, fine);
+                        notificationList.add(item);
+                    }
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+                return notificationList;
             }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
+        };
+
+        task.setOnSucceeded(e -> {
+            list.setAll(task.getValue());
+        });
+
+        new Thread(task).start();
     }
 
     @FXML
