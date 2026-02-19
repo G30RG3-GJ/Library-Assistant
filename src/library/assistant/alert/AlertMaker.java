@@ -25,8 +25,13 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javax.imageio.ImageIO;
 import library.assistant.util.LibraryAssistantUtil;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class AlertMaker {
+
+    private final static Logger LOGGER = LogManager.getLogger(AlertMaker.class.getName());
 
     public static void showSimpleAlert(String title, String content) {
         Alert alert = new Alert(AlertType.INFORMATION);
@@ -118,7 +123,7 @@ public class AlertMaker {
             trayIcon.displayMessage(title, message, MessageType.INFO);
             tray.remove(trayIcon);
         } catch (Exception exp) {
-            exp.printStackTrace();
+            LOGGER.log(Level.ERROR, "Exception occurred while showing tray message", exp);
         }
     }
 
