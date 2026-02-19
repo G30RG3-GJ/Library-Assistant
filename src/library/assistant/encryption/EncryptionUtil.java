@@ -25,6 +25,7 @@ public class EncryptionUtil {
     private final static Logger LOGGER = LogManager.getLogger(EncryptionUtil.class.getName());
     private static final String ENCRYPTION_ALGORITHM = "AES/CBC/PKCS5PADDING";
     private static final String SECRET_KEY_SPEC = "AES";
+    private static final int AES_KEY_SIZE = 128;
     private static final File KEY_STORE = new File("store/key.spec");
     private static final Lock LOCK = new ReentrantLock(true);
 
@@ -108,7 +109,7 @@ public class EncryptionUtil {
 
     private static byte[] generateSecureKey() throws NoSuchAlgorithmException {
         KeyGenerator keyGen = KeyGenerator.getInstance(SECRET_KEY_SPEC);
-        keyGen.init(128);
+        keyGen.init(AES_KEY_SIZE);
         SecretKey secretKey = keyGen.generateKey();
         byte[] data = secretKey.getEncoded();
         return data;
