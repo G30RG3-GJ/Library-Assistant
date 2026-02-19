@@ -236,13 +236,7 @@ public class MainController implements Initializable, BookReturnCallback {
 
         JFXButton yesButton = new JFXButton("YES");
         yesButton.addEventHandler(MouseEvent.MOUSE_CLICKED, (MouseEvent event1) -> {
-            String str = "INSERT INTO ISSUE(memberID,bookID) VALUES ("
-                    + "'" + memberID + "',"
-                    + "'" + bookID + "')";
-            String str2 = "UPDATE BOOK SET isAvail = false WHERE id = '" + bookID + "'";
-            System.out.println(str + " and " + str2);
-
-            if (databaseHandler.execAction(str) && databaseHandler.execAction(str2)) {
+            if (DataHelper.issueBook(bookID, memberID)) {
                 JFXButton button = new JFXButton("Done!");
                 button.setOnAction((actionEvent) -> {
                     bookIDInput.requestFocus();

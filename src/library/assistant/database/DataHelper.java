@@ -146,4 +146,31 @@ public class DataHelper {
         }
         return null;
     }
+
+    public static boolean issueBook(String bookID, String memberID) {
+        return issueBook(bookID, memberID, DatabaseHandler.getInstance().getConnection());
+    }
+
+    public static boolean issueBook(String bookID, String memberID, Connection conn) {
+        try {
+            String insertIssue = "INSERT INTO ISSUE(memberID,bookID) VALUES (?, ?)";
+            String updateBook = "UPDATE BOOK SET isAvail = false WHERE id = ?";
+
+            try (PreparedStatement stmt1 = conn.prepareStatement(insertIssue);
+                 PreparedStatement stmt2 = conn.prepareStatement(updateBook)) {
+                stmt1.setString(1, memberID);
+                stmt1.setString(2, bookID);
+
+                stmt2.setString(1, bookID);
+
+                int res1 = stmt1.executeUpdate();
+                int res2 = stmt2.executeUpdate();
+
+                return (res1 > 0 && res2 > 0);
+            }
+        } catch (SQLException ex) {
+            LOGGER.log(Level.ERROR, "{}", ex);
+        }
+        return false;
+    }
 }
