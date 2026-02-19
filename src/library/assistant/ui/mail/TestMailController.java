@@ -35,7 +35,8 @@ public class TestMailController implements Initializable, GenericCallback {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // TODO
+        LOGGER.log(Level.INFO, "TestMailController Initialized");
+        Platform.runLater(() -> recepientAddressInput.requestFocus());
     }
 
     public void setMailServerInfo(MailServerInfo mailServerInfo) {
