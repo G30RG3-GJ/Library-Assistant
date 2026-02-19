@@ -5,6 +5,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import library.assistant.data.model.Book;
 import library.assistant.data.model.MailServerInfo;
 import library.assistant.ui.listmember.MemberListController.Member;
@@ -19,6 +22,9 @@ import org.apache.logging.log4j.Logger;
 public class DataHelper {
 
     private final static Logger LOGGER = LogManager.getLogger(DatabaseHandler.class.getName());
+    private static final Set<String> ALLOWED_TABLES = new HashSet<>(Arrays.asList(
+            "BOOK", "MEMBER", "ISSUE", "MAIL_SERVER_INFO"
+    ));
 
     public static boolean insertNewBook(Book book) {
         return insertNewBook(book, DatabaseHandler.getInstance().getConnection());
@@ -103,6 +109,9 @@ public class DataHelper {
     }
 
     public static void wipeTable(String tableName) {
+        if (!ALLOWED_TABLES.contains(tableName)) {
+            throw new IllegalArgumentException("Invalid table name: " + tableName);
+        }
         try {
             Statement statement = DatabaseHandler.getInstance().getConnection().createStatement();
             statement.execute("DELETE FROM " + tableName + " WHERE TRUE");
