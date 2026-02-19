@@ -35,7 +35,6 @@ public final class DatabaseHandler {
 
     private static final String DB_URL = "jdbc:derby:database;create=true";
     private static Connection conn = null;
-    private static Statement stmt = null;
 
     static {
         createConnection();
@@ -109,23 +108,28 @@ public final class DatabaseHandler {
     }
 
     public ResultSet execQuery(String query) {
-        ResultSet result;
+        Statement stmt = null;
         try {
             stmt = conn.createStatement();
-            result = stmt.executeQuery(query);
+            stmt.closeOnCompletion();
+            return stmt.executeQuery(query);
         }
         catch (SQLException ex) {
             System.out.println("Exception at execQuery:dataHandler" + ex.getLocalizedMessage());
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                }
+                catch (SQLException e) {
+                    LOGGER.log(Level.ERROR, "{}", e);
+                }
+            }
             return null;
         }
-        finally {
-        }
-        return result;
     }
 
     public boolean execAction(String qu) {
-        try {
-            stmt = conn.createStatement();
+        try (Statement stmt = conn.createStatement()) {
             stmt.execute(qu);
             return true;
         }
