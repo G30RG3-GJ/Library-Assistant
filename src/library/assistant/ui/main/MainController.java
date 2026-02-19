@@ -15,9 +15,10 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.ResourceBundle;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.collections.FXCollections;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
@@ -46,6 +47,8 @@ import library.assistant.ui.main.toolbar.ToolbarController;
 import library.assistant.util.LibraryAssistantUtil;
 
 public class MainController implements Initializable, BookReturnCallback {
+
+    private final static Logger LOGGER = LogManager.getLogger(MainController.class.getName());
 
     private static final String BOOK_NOT_AVAILABLE = "Not Available";
     private static final String NO_SUCH_BOOK_AVAILABLE = "No Such Book Available";
@@ -166,7 +169,7 @@ public class MainController implements Initializable, BookReturnCallback {
             }
 
         } catch (SQLException ex) {
-            Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.ERROR, "Exception occurred", ex);
         }
     }
 
@@ -207,7 +210,7 @@ public class MainController implements Initializable, BookReturnCallback {
                 btnIssue.requestFocus();
             }
         } catch (SQLException ex) {
-            Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.ERROR, "Exception occurred", ex);
         }
     }
 
@@ -240,7 +243,7 @@ public class MainController implements Initializable, BookReturnCallback {
                     + "'" + memberID + "',"
                     + "'" + bookID + "')";
             String str2 = "UPDATE BOOK SET isAvail = false WHERE id = '" + bookID + "'";
-            System.out.println(str + " and " + str2);
+            LOGGER.log(Level.INFO, "{} and {}", str, str2);
 
             if (databaseHandler.execAction(str) && databaseHandler.execAction(str2)) {
                 JFXButton button = new JFXButton("Done!");
@@ -314,7 +317,7 @@ public class MainController implements Initializable, BookReturnCallback {
                 AlertMaker.showMaterialDialog(rootPane, rootAnchorPane, Arrays.asList(button), "No such Book Exists in Issue Database", null);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.ERROR, "Exception occurred", e);
         }
 
     }
@@ -365,7 +368,7 @@ public class MainController implements Initializable, BookReturnCallback {
         JFXButton yesButton = new JFXButton("YES, Please");
         yesButton.addEventHandler(MouseEvent.MOUSE_CLICKED, (MouseEvent event1) -> {
             String ac = "UPDATE ISSUE SET issueTime = CURRENT_TIMESTAMP, renew_count = renew_count+1 WHERE BOOKID = '" + bookID.getText() + "'";
-            System.out.println(ac);
+            LOGGER.log(Level.INFO, "{}", ac);
             if (databaseHandler.execAction(ac)) {
                 JFXButton btn = new JFXButton("Alright!");
                 AlertMaker.showMaterialDialog(rootPane, rootAnchorPane, Arrays.asList(btn), "Book Has Been Renewed", null);
@@ -446,7 +449,7 @@ public class MainController implements Initializable, BookReturnCallback {
             ToolbarController controller = loader.getController();
             controller.setBookReturnCallback(this);
         } catch (IOException ex) {
-            Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.ERROR, "Exception occurred", ex);
         }
         HamburgerSlideCloseTransition task = new HamburgerSlideCloseTransition(hamburger);
         task.setRate(-1);
