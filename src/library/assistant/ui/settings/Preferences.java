@@ -56,27 +56,15 @@ public class Preferences {
     }
 
     public void setPassword(String password) {
-        if (password.length() < 16) {
-            this.password = DigestUtils.shaHex(password);
-        }else
-            this.password = password;
+        this.password = DigestUtils.sha256Hex(password);
     }
 
     public static void initConfig() {
-        Writer writer = null;
+        Preferences preference = new Preferences();
         try {
-            Preferences preference = new Preferences();
-            Gson gson = new Gson();
-            writer = new FileWriter(CONFIG_FILE);
-            gson.toJson(preference, writer);
+            savePreferencesToDisk(preference);
         } catch (IOException ex) {
             Logger.getLogger(Preferences.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            try {
-                writer.close();
-            } catch (IOException ex) {
-                Logger.getLogger(Preferences.class.getName()).log(Level.SEVERE, null, ex);
-            }
         }
     }
 
@@ -92,23 +80,26 @@ public class Preferences {
         return preferences;
     }
 
-    public static void writePreferenceToFile(Preferences preference) {
+    public static void savePreferencesToDisk(Preferences preference) throws IOException {
         Writer writer = null;
         try {
             Gson gson = new Gson();
             writer = new FileWriter(CONFIG_FILE);
             gson.toJson(preference, writer);
+        } finally {
+            if (writer != null) {
+                writer.close();
+            }
+        }
+    }
 
+    public static void writePreferenceToFile(Preferences preference) {
+        try {
+            savePreferencesToDisk(preference);
             AlertMaker.showSimpleAlert("Success", "Settings updated");
         } catch (IOException ex) {
             Logger.getLogger(Preferences.class.getName()).log(Level.SEVERE, null, ex);
             AlertMaker.showErrorMessage(ex, "Failed", "Cant save configuration file");
-        } finally {
-            try {
-                writer.close();
-            } catch (IOException ex) {
-                Logger.getLogger(Preferences.class.getName()).log(Level.SEVERE, null, ex);
-            }
         }
     }
 

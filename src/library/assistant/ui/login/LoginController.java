@@ -40,14 +40,33 @@ public class LoginController implements Initializable {
     @FXML
     private void handleLoginButtonAction(ActionEvent event) {
         String uname = StringUtils.trimToEmpty(username.getText());
-        String pword = DigestUtils.shaHex(password.getText());
+        String pword = password.getText();
+        String sha256 = DigestUtils.sha256Hex(pword);
+        String sha1 = DigestUtils.shaHex(pword);
+        String storedPassword = preference.getPassword();
 
-        if (uname.equals(preference.getUsername()) && pword.equals(preference.getPassword())) {
+        boolean loginSuccess = false;
+
+        if (uname.equals(preference.getUsername())) {
+            if (sha256.equals(storedPassword)) {
+                loginSuccess = true;
+            } else if (sha1.equals(storedPassword)) {
+                preference.setPassword(pword);
+                try {
+                    Preferences.savePreferencesToDisk(preference);
+                    LOGGER.log(Level.INFO, "Migrated password for user {} to SHA-256", uname);
+                } catch (IOException ex) {
+                    LOGGER.log(Level.ERROR, "Failed to save preferences after migration", ex);
+                }
+                loginSuccess = true;
+            }
+        }
+
+        if (loginSuccess) {
             closeStage();
             loadMain();
             LOGGER.log(Level.INFO, "User successfully logged in {}", uname);
-        }
-        else {
+        } else {
             username.getStyleClass().add("wrong-credentials");
             password.getStyleClass().add("wrong-credentials");
         }
