@@ -31,6 +31,7 @@ public class DataHelperTest {
         verify(mockStmt).setString(4, "Test Publisher");
         verify(mockStmt).setBoolean(5, true);
         verify(mockStmt).executeUpdate();
+        verify(mockStmt).close();
     }
 
     @Test
