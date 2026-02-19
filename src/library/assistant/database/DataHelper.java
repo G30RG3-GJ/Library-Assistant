@@ -146,4 +146,24 @@ public class DataHelper {
         }
         return null;
     }
+
+    public static ResultSet getIssueDetails(String bookID) throws SQLException {
+        return getIssueDetails(bookID, DatabaseHandler.getInstance().getConnection());
+    }
+
+    public static ResultSet getIssueDetails(String bookID, Connection conn) throws SQLException {
+        String myQuery = "SELECT ISSUE.bookID, ISSUE.memberID, ISSUE.issueTime, ISSUE.renew_count,\n"
+                + "MEMBER.name, MEMBER.mobile, MEMBER.email,\n"
+                + "BOOK.title, BOOK.author, BOOK.publisher\n"
+                + "FROM ISSUE\n"
+                + "LEFT JOIN MEMBER\n"
+                + "ON ISSUE.memberID=MEMBER.ID\n"
+                + "LEFT JOIN BOOK\n"
+                + "ON ISSUE.bookID=BOOK.ID\n"
+                + "WHERE ISSUE.bookID=?";
+        PreparedStatement stmt = conn.prepareStatement(myQuery);
+        stmt.setString(1, bookID);
+        ResultSet rs = stmt.executeQuery();
+        return rs;
+    }
 }

@@ -273,17 +273,8 @@ public class MainController implements Initializable, BookReturnCallback {
 
         try {
             String id = bookID.getText();
-            String myQuery = "SELECT ISSUE.bookID, ISSUE.memberID, ISSUE.issueTime, ISSUE.renew_count,\n"
-                    + "MEMBER.name, MEMBER.mobile, MEMBER.email,\n"
-                    + "BOOK.title, BOOK.author, BOOK.publisher\n"
-                    + "FROM ISSUE\n"
-                    + "LEFT JOIN MEMBER\n"
-                    + "ON ISSUE.memberID=MEMBER.ID\n"
-                    + "LEFT JOIN BOOK\n"
-                    + "ON ISSUE.bookID=BOOK.ID\n"
-                    + "WHERE ISSUE.bookID='" + id + "'";
-            ResultSet rs = databaseHandler.execQuery(myQuery);
-            if (rs.next()) {
+            ResultSet rs = DataHelper.getIssueDetails(id);
+            if (rs != null && rs.next()) {
                 memberNameHolder.setText(rs.getString("name"));
                 memberContactHolder.setText(rs.getString("mobile"));
                 memberEmailHolder.setText(rs.getString("email"));
@@ -313,8 +304,8 @@ public class MainController implements Initializable, BookReturnCallback {
                 JFXButton button = new JFXButton("Okay.I'll Check");
                 AlertMaker.showMaterialDialog(rootPane, rootAnchorPane, Arrays.asList(button), "No such Book Exists in Issue Database", null);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (SQLException e) {
+            Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, e);
         }
 
     }
