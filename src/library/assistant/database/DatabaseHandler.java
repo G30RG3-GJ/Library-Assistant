@@ -56,7 +56,7 @@ public final class DatabaseHandler {
         List<String> tableData = new ArrayList<>();
         try {
             Set<String> loadedTables = getDBTables();
-            System.out.println("Already loaded tables " + loadedTables);
+            LOGGER.log(Level.INFO, "Already loaded tables {}", loadedTables);
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(DatabaseHandler.class.getClass().getResourceAsStream("/resources/database/tables.xml"));
@@ -71,15 +71,15 @@ public final class DatabaseHandler {
                 }
             }
             if (tableData.isEmpty()) {
-                System.out.println("Tables are already loaded");
+                LOGGER.log(Level.INFO, "Tables are already loaded");
             }
             else {
-                System.out.println("Inflating new tables.");
+                LOGGER.log(Level.INFO, "Inflating new tables.");
                 createTables(tableData);
             }
         }
         catch (Exception ex) {
-            LOGGER.log(Level.ERROR, "{}", ex);
+            LOGGER.log(Level.ERROR, "Exception occurred", ex);
         }
     }
 
@@ -115,7 +115,7 @@ public final class DatabaseHandler {
             result = stmt.executeQuery(query);
         }
         catch (SQLException ex) {
-            System.out.println("Exception at execQuery:dataHandler" + ex.getLocalizedMessage());
+            LOGGER.log(Level.ERROR, "Exception at execQuery:dataHandler", ex);
             return null;
         }
         finally {
@@ -131,7 +131,7 @@ public final class DatabaseHandler {
         }
         catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, "Error:" + ex.getMessage(), "Error Occured", JOptionPane.ERROR_MESSAGE);
-            System.out.println("Exception at execQuery:dataHandler" + ex.getLocalizedMessage());
+            LOGGER.log(Level.ERROR, "Exception at execQuery:dataHandler", ex);
             return false;
         }
         finally {
@@ -149,7 +149,7 @@ public final class DatabaseHandler {
             }
         }
         catch (SQLException ex) {
-            LOGGER.log(Level.ERROR, "{}", ex);
+            LOGGER.log(Level.ERROR, "Exception occurred", ex);
         }
         return false;
     }
@@ -162,12 +162,12 @@ public final class DatabaseHandler {
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 int count = rs.getInt(1);
-                System.out.println(count);
+                LOGGER.log(Level.INFO, "Book issue count: {}", count);
                 return (count > 0);
             }
         }
         catch (SQLException ex) {
-            LOGGER.log(Level.ERROR, "{}", ex);
+            LOGGER.log(Level.ERROR, "Exception occurred", ex);
         }
         return false;
     }
@@ -183,7 +183,7 @@ public final class DatabaseHandler {
             }
         }
         catch (SQLException ex) {
-            LOGGER.log(Level.ERROR, "{}", ex);
+            LOGGER.log(Level.ERROR, "Exception occurred", ex);
         }
         return false;
     }
@@ -196,12 +196,12 @@ public final class DatabaseHandler {
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 int count = rs.getInt(1);
-                System.out.println(count);
+                LOGGER.log(Level.INFO, "Member issue count: {}", count);
                 return (count > 0);
             }
         }
         catch (SQLException ex) {
-            LOGGER.log(Level.ERROR, "{}", ex);
+            LOGGER.log(Level.ERROR, "Exception occurred", ex);
         }
         return false;
     }
@@ -218,7 +218,7 @@ public final class DatabaseHandler {
             return (res > 0);
         }
         catch (SQLException ex) {
-            LOGGER.log(Level.ERROR, "{}", ex);
+            LOGGER.log(Level.ERROR, "Exception occurred", ex);
         }
         return false;
     }
@@ -235,7 +235,7 @@ public final class DatabaseHandler {
             return (res > 0);
         }
         catch (SQLException ex) {
-            LOGGER.log(Level.ERROR, "{}", ex);
+            LOGGER.log(Level.ERROR, "Exception occurred", ex);
         }
         return false;
     }
@@ -261,7 +261,7 @@ public final class DatabaseHandler {
             }
         }
         catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.ERROR, "Exception occurred", e);
         }
         return data;
     }
@@ -283,7 +283,7 @@ public final class DatabaseHandler {
             }
         }
         catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.ERROR, "Exception occurred", e);
         }
         return data;
     }
@@ -292,7 +292,7 @@ public final class DatabaseHandler {
         Statement statement = conn.createStatement();
         statement.closeOnCompletion();
         for (String command : tableData) {
-            System.out.println(command);
+            LOGGER.log(Level.INFO, "Executing SQL command: {}", command);
             statement.addBatch(command);
         }
         statement.executeBatch();
