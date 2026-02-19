@@ -99,7 +99,7 @@ public class IssuedListController implements Initializable {
                 Timestamp issueTime = rs.getTimestamp("issueTime");
                 System.out.println("Issued on " + issueTime);
                 Integer days = Math.toIntExact(TimeUnit.MILLISECONDS.toDays(System.currentTimeMillis() - issueTime.getTime())) + 1;
-                Float fine = LibraryAssistantUtil.getFineAmount(days);
+                Float fine = LibraryAssistantUtil.getFineAmount(days, pref);
                 IssueInfo issueInfo = new IssueInfo(counter, bookID, bookTitle, memberName, LibraryAssistantUtil.formatDateTimeString(new Date(issueTime.getTime())), days, fine);
                 list.add(issueInfo);
             }

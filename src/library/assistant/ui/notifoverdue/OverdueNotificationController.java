@@ -110,7 +110,7 @@ public class OverdueNotificationController implements Initializable {
                 Timestamp issueTime = rs.getTimestamp("issueTime");
                 System.out.println("Issued on " + issueTime);
                 Integer days = Math.toIntExact(TimeUnit.MILLISECONDS.toDays(System.currentTimeMillis() - issueTime.getTime())) + 1;
-                Float fine = LibraryAssistantUtil.getFineAmount(days);
+                Float fine = LibraryAssistantUtil.getFineAmount(days, pref);
 
                 NotificationItem item = new NotificationItem(true, memberID, memberName, email, bookTitle, LibraryAssistantUtil.getDateString(issueTime), days, fine);
                 list.add(item);
