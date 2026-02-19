@@ -28,6 +28,9 @@ import library.assistant.database.DatabaseHandler;
 import library.assistant.ui.settings.Preferences;
 import library.assistant.ui.callback.BookReturnCallback;
 import library.assistant.util.LibraryAssistantUtil;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /*
  * @author afsal villan
@@ -36,6 +39,7 @@ public class IssuedListController implements Initializable {
 
     private ObservableList<IssueInfo> list = FXCollections.observableArrayList();
     private BookReturnCallback callback;
+    private final static Logger LOGGER = LogManager.getLogger(IssuedListController.class.getName());
 
     @FXML
     private TableView<IssueInfo> tableView;
@@ -97,7 +101,7 @@ public class IssuedListController implements Initializable {
                 String bookID = rs.getString("bookID");
                 String bookTitle = rs.getString("title");
                 Timestamp issueTime = rs.getTimestamp("issueTime");
-                System.out.println("Issued on " + issueTime);
+                LOGGER.log(Level.INFO, "Issued on {}", issueTime);
                 Integer days = Math.toIntExact(TimeUnit.MILLISECONDS.toDays(System.currentTimeMillis() - issueTime.getTime())) + 1;
                 Float fine = LibraryAssistantUtil.getFineAmount(days);
                 IssueInfo issueInfo = new IssueInfo(counter, bookID, bookTitle, memberName, LibraryAssistantUtil.formatDateTimeString(new Date(issueTime.getTime())), days, fine);
@@ -167,7 +171,7 @@ public class IssuedListController implements Initializable {
             this.dateOfIssue = new SimpleStringProperty(dateOfIssue);
             this.nDays = new SimpleIntegerProperty(nDays);
             this.fine = new SimpleFloatProperty(fine);
-            System.out.println(this.nDays.get());
+            LOGGER.log(Level.INFO, "Days: {}", this.nDays.get());
         }
 
         public Integer getId() {
