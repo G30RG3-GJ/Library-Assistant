@@ -77,25 +77,25 @@ public class BookListController implements Initializable {
     private void loadData() {
         list.clear();
 
-        DatabaseHandler handler = DatabaseHandler.getInstance();
-        String qu = "SELECT * FROM BOOK";
-        ResultSet rs = handler.execQuery(qu);
-        try {
-            while (rs.next()) {
-                String titlex = rs.getString("title");
-                String author = rs.getString("author");
-                String id = rs.getString("id");
-                String publisher = rs.getString("publisher");
-                Boolean avail = rs.getBoolean("isAvail");
-
-                list.add(new Book(titlex, id, author, publisher, avail));
-
+        javafx.concurrent.Task<List<library.assistant.data.model.Book>> task = new javafx.concurrent.Task<List<library.assistant.data.model.Book>>() {
+            @Override
+            protected List<library.assistant.data.model.Book> call() throws Exception {
+                return new BookLoader().loadBooks(DatabaseHandler.getInstance().getConnection());
             }
-        } catch (SQLException ex) {
-            Logger.getLogger(BookAddController.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        };
 
-        tableView.setItems(list);
+        task.setOnSucceeded(e -> {
+            for (library.assistant.data.model.Book b : task.getValue()) {
+                list.add(new Book(b.getTitle(), b.getId(), b.getAuthor(), b.getPublisher(), b.getAvailability()));
+            }
+            tableView.setItems(list);
+        });
+
+        task.setOnFailed(e -> {
+            Logger.getLogger(BookListController.class.getName()).log(Level.SEVERE, "Failed to load books", task.getException());
+        });
+
+        new Thread(task).start();
     }
 
     @FXML
