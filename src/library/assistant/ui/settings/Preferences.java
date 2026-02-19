@@ -23,8 +23,6 @@ public class Preferences {
     public Preferences() {
         nDaysWithoutFine = 14;
         finePerDay = 2;
-        username = "admin";
-        setPassword("admin");
     }
 
     public int getnDaysWithoutFine() {
