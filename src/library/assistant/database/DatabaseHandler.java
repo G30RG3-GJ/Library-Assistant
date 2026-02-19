@@ -155,10 +155,13 @@ public final class DatabaseHandler {
     }
 
     public boolean isBookAlreadyIssued(Book book) {
+        return checkDataExists("SELECT COUNT(*) FROM ISSUE WHERE bookid=?", book.getId());
+    }
+
+    private boolean checkDataExists(String query, String id) {
         try {
-            String checkstmt = "SELECT COUNT(*) FROM ISSUE WHERE bookid=?";
-            PreparedStatement stmt = conn.prepareStatement(checkstmt);
-            stmt.setString(1, book.getId());
+            PreparedStatement stmt = conn.prepareStatement(query);
+            stmt.setString(1, id);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 int count = rs.getInt(1);
@@ -189,21 +192,7 @@ public final class DatabaseHandler {
     }
 
     public boolean isMemberHasAnyBooks(MemberListController.Member member) {
-        try {
-            String checkstmt = "SELECT COUNT(*) FROM ISSUE WHERE memberID=?";
-            PreparedStatement stmt = conn.prepareStatement(checkstmt);
-            stmt.setString(1, member.getId());
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                int count = rs.getInt(1);
-                System.out.println(count);
-                return (count > 0);
-            }
-        }
-        catch (SQLException ex) {
-            LOGGER.log(Level.ERROR, "{}", ex);
-        }
-        return false;
+        return checkDataExists("SELECT COUNT(*) FROM ISSUE WHERE memberID=?", member.getId());
     }
 
     public boolean updateBook(Book book) {
