@@ -236,13 +236,11 @@ public class MainController implements Initializable, BookReturnCallback {
 
         JFXButton yesButton = new JFXButton("YES");
         yesButton.addEventHandler(MouseEvent.MOUSE_CLICKED, (MouseEvent event1) -> {
-            String str = "INSERT INTO ISSUE(memberID,bookID) VALUES ("
-                    + "'" + memberID + "',"
-                    + "'" + bookID + "')";
-            String str2 = "UPDATE BOOK SET isAvail = false WHERE id = '" + bookID + "'";
+            String str = "INSERT INTO ISSUE(memberID,bookID) VALUES (?, ?)";
+            String str2 = "UPDATE BOOK SET isAvail = false WHERE id = ?";
             System.out.println(str + " and " + str2);
 
-            if (databaseHandler.execAction(str) && databaseHandler.execAction(str2)) {
+            if (databaseHandler.execUpdate(str, memberID, bookID) && databaseHandler.execUpdate(str2, bookID)) {
                 JFXButton button = new JFXButton("Done!");
                 button.setOnAction((actionEvent) -> {
                     bookIDInput.requestFocus();
@@ -330,10 +328,10 @@ public class MainController implements Initializable, BookReturnCallback {
         JFXButton yesButton = new JFXButton("YES, Please");
         yesButton.addEventHandler(MouseEvent.MOUSE_CLICKED, (MouseEvent ev) -> {
             String id = bookID.getText();
-            String ac1 = "DELETE FROM ISSUE WHERE BOOKID = '" + id + "'";
-            String ac2 = "UPDATE BOOK SET ISAVAIL = TRUE WHERE ID = '" + id + "'";
+            String ac1 = "DELETE FROM ISSUE WHERE BOOKID = ?";
+            String ac2 = "UPDATE BOOK SET ISAVAIL = TRUE WHERE ID = ?";
 
-            if (databaseHandler.execAction(ac1) && databaseHandler.execAction(ac2)) {
+            if (databaseHandler.execUpdate(ac1, id) && databaseHandler.execUpdate(ac2, id)) {
                 JFXButton btn = new JFXButton("Done!");
                 btn.setOnAction((actionEvent) -> {
                     bookID.requestFocus();
@@ -364,9 +362,9 @@ public class MainController implements Initializable, BookReturnCallback {
         }
         JFXButton yesButton = new JFXButton("YES, Please");
         yesButton.addEventHandler(MouseEvent.MOUSE_CLICKED, (MouseEvent event1) -> {
-            String ac = "UPDATE ISSUE SET issueTime = CURRENT_TIMESTAMP, renew_count = renew_count+1 WHERE BOOKID = '" + bookID.getText() + "'";
+            String ac = "UPDATE ISSUE SET issueTime = CURRENT_TIMESTAMP, renew_count = renew_count+1 WHERE BOOKID = ?";
             System.out.println(ac);
-            if (databaseHandler.execAction(ac)) {
+            if (databaseHandler.execUpdate(ac, bookID.getText())) {
                 JFXButton btn = new JFXButton("Alright!");
                 AlertMaker.showMaterialDialog(rootPane, rootAnchorPane, Arrays.asList(btn), "Book Has Been Renewed", null);
                 disableEnableControls(false);

@@ -123,6 +123,11 @@ public final class DatabaseHandler {
         return result;
     }
 
+    public boolean execUpdate(String query, Object... params) {
+        return SqlHelper.execUpdate(getConnection(), query, params);
+    }
+
+    @Deprecated
     public boolean execAction(String qu) {
         try {
             stmt = conn.createStatement();
