@@ -13,6 +13,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
+import javafx.concurrent.Task;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -75,22 +76,34 @@ public class MemberListController implements Initializable {
     private void loadData() {
         list.clear();
 
-        DatabaseHandler handler = DatabaseHandler.getInstance();
-        String qu = "SELECT * FROM MEMBER";
-        ResultSet rs = handler.execQuery(qu);
-        try {
-            while (rs.next()) {
-                String name = rs.getString("name");
-                String mobile = rs.getString("mobile");
-                String id = rs.getString("id");
-                String email = rs.getString("email");
+        Task<List<Member>> task = new Task<List<Member>>() {
+            @Override
+            protected List<Member> call() throws Exception {
+                List<Member> memberList = new ArrayList<>();
+                DatabaseHandler handler = DatabaseHandler.getInstance();
+                String qu = "SELECT * FROM MEMBER";
+                ResultSet rs = handler.execQuery(qu);
+                while (rs.next()) {
+                    String name = rs.getString("name");
+                    String mobile = rs.getString("mobile");
+                    String id = rs.getString("id");
+                    String email = rs.getString("email");
 
-                list.add(new Member(name, id, mobile, email));
-
+                    memberList.add(new Member(name, id, mobile, email));
+                }
+                return memberList;
             }
-        } catch (SQLException ex) {
-            Logger.getLogger(BookAddController.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        };
+
+        task.setOnSucceeded(e -> {
+            list.setAll(task.getValue());
+        });
+
+        task.setOnFailed(e -> {
+            Logger.getLogger(MemberListController.class.getName()).log(Level.SEVERE, "Failed to load members", task.getException());
+        });
+
+        new Thread(task).start();
 
         tableView.setItems(list);
     }
