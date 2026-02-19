@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.security.GeneralSecurityException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.concurrent.locks.Lock;
@@ -68,8 +69,8 @@ public class EncryptionUtil {
             cipher.init(Cipher.ENCRYPT_MODE, skeySpec, iv);
             byte[] encrypted = cipher.doFinal(value.getBytes());
             return Base64.encodeBase64String(encrypted);
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        } catch (GeneralSecurityException ex) {
+            LOGGER.log(Level.ERROR, "Encryption failure", ex);
         }
 
         return null;
@@ -86,8 +87,8 @@ public class EncryptionUtil {
             byte[] original = cipher.doFinal(Base64.decodeBase64(encrypted));
 
             return new String(original);
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        } catch (GeneralSecurityException ex) {
+            LOGGER.log(Level.ERROR, "Decryption failure", ex);
         }
 
         return null;
