@@ -261,7 +261,7 @@ public final class DatabaseHandler {
             }
         }
         catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.ERROR, "Exception at getBookGraphStatistics", e);
         }
         return data;
     }
@@ -283,7 +283,7 @@ public final class DatabaseHandler {
             }
         }
         catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.ERROR, "Exception at getMemberGraphStatistics", e);
         }
         return data;
     }
