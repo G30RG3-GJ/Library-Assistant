@@ -2,6 +2,7 @@
 This is a library management software developed using JavaFX programming language. The entire development video with explanation of each and every part (in realtime) is available in my YouTube Channel [Genuine Coder Youtube Channel](https://www.youtube.com/playlist?list=PLhs1urmduZ29jTcE1ca8Z6bZNvH_39ayL).
   
 ### New Features (v1.1.0)
+* **Search Functionality**: Real-time search in Book and Member lists.
 * **Data Export**: Export Book and Member lists to CSV format for easy reporting.
 * **Email Validation**: Enhanced validation for member email addresses during registration.
 * **Release Automation**: One-click packaging using `package_app.ps1`.
