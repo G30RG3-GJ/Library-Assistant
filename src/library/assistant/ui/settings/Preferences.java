@@ -23,8 +23,8 @@ public class Preferences {
     public Preferences() {
         nDaysWithoutFine = 14;
         finePerDay = 2;
-        username = "admin";
-        setPassword("admin");
+        username = "";
+        password = "";
     }
 
     public int getnDaysWithoutFine() {
@@ -56,10 +56,7 @@ public class Preferences {
     }
 
     public void setPassword(String password) {
-        if (password.length() < 16) {
-            this.password = DigestUtils.shaHex(password);
-        }else
-            this.password = password;
+        this.password = DigestUtils.shaHex(password);
     }
 
     public static void initConfig() {
