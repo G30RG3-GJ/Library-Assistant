@@ -56,8 +56,8 @@ if ($LASTEXITCODE -eq 0) {
     Write-Host "Compilation successful."
     Write-Host "Running application..."
     
-    # Run application
-    & $JAVA_EXE -Dprism.order=sw -cp "$CLASSPATH" library.assistant.ui.main.MainLauncher
+    # Run application with quoted --add-opens to fix JFoenix reflection compatibility issues
+    & $JAVA_EXE "-Dprism.order=sw" "--add-opens=javafx.controls/javafx.scene.control.skin=ALL-UNNAMED" "--add-opens=javafx.graphics/javafx.scene=ALL-UNNAMED" "--add-opens=javafx.controls/com.sun.javafx.scene.control.skin=ALL-UNNAMED" "--add-opens=javafx.graphics/com.sun.javafx.scene=ALL-UNNAMED" "--add-opens=javafx.controls/com.sun.javafx.scene.control.behavior=ALL-UNNAMED" "--add-opens=javafx.base/com.sun.javafx.binding=ALL-UNNAMED" "--add-opens=javafx.graphics/com.sun.javafx.stage=ALL-UNNAMED" "--add-opens=javafx.base/com.sun.javafx.event=ALL-UNNAMED" -cp "$CLASSPATH" library.assistant.ui.main.MainLauncher
 }
 else {
     Write-Host "Compilation failed."
