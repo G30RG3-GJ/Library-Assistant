@@ -74,6 +74,7 @@ New-Item -ItemType Directory -Force -Path $TEMP_ZIP_DIR | Out-Null
 Copy-Item "$DIST_DIR\$JAR_NAME" -Destination $TEMP_ZIP_DIR
 New-Item -ItemType Directory -Force -Path "$TEMP_ZIP_DIR\libs" | Out-Null
 Copy-Item "$LIB_DIR\*" -Destination "$TEMP_ZIP_DIR\libs" -Recurse
+Copy-Item "$LIB_DIR\*.dll" -Destination $TEMP_ZIP_DIR -Force
 
 # Zip it
 Compress-Archive -Path "$TEMP_ZIP_DIR\*" -DestinationPath $ZIP_PATH -Force
