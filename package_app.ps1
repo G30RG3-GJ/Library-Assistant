@@ -41,7 +41,7 @@ $WRAPPED_CLASS_PATH = ""
 $CURRENT_LINE = "Class-Path: "
 foreach ($item in $LIB_NAMES) {
     if (($CURRENT_LINE.Length + $item.Length + 1) -gt 70) {
-        $WRAPPED_CLASS_PATH += $CURRENT_LINE + "`r`n"
+        $WRAPPED_CLASS_PATH += $CURRENT_LINE + " `r`n"
         $CURRENT_LINE = " " + $item
     } else {
         if ($CURRENT_LINE -eq "Class-Path: ") {
