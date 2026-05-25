@@ -70,21 +70,35 @@ $ZIP_PATH = "$DIST_DIR\$ZIP_NAME"
 $TEMP_ZIP_DIR = "$DIST_DIR\LibraryAssistant"
 New-Item -ItemType Directory -Force -Path $TEMP_ZIP_DIR | Out-Null
 
-# Copy JAR and Libs
+# Copy JAR
 Copy-Item "$DIST_DIR\$JAR_NAME" -Destination $TEMP_ZIP_DIR
 New-Item -ItemType Directory -Force -Path "$TEMP_ZIP_DIR\libs" | Out-Null
-Copy-Item "$LIB_DIR\*" -Destination "$TEMP_ZIP_DIR\libs" -Recurse
-Copy-Item "$LIB_DIR\*.dll" -Destination $TEMP_ZIP_DIR -Force
 
-# Zip it
+# Copy ONLY non-JavaFX dependency JARs (and no DLLs!)
+Get-ChildItem "$LIB_DIR\*.jar" | Where-Object { $_.Name -notlike "javafx*" } | ForEach-Object {
+    Copy-Item $_.FullName -Destination "$TEMP_ZIP_DIR\libs"
+}
+
+# Zip standard distribution (contains main JAR and non-JavaFX libs)
 Compress-Archive -Path "$TEMP_ZIP_DIR\*" -DestinationPath $ZIP_PATH -Force
+
+# Verify and download JMODs if needed
+$jmods_zip = "openjfx-jmods.zip"
+$jmods_dir = "$PROJECT_ROOT\openjfx-jmods"
+if (!(Test-Path $jmods_dir)) {
+    Write-Host "Downloading JavaFX JMODs..."
+    Invoke-WebRequest -Uri "https://download2.gluonhq.com/openjfx/17.0.10/openjfx-17.0.10_windows-x64_bin-jmods.zip" -OutFile "$PROJECT_ROOT\$jmods_zip"
+    Write-Host "Extracting JavaFX JMODs..."
+    Expand-Archive -Path "$PROJECT_ROOT\$jmods_zip" -DestinationPath $jmods_dir
+    Remove-Item -Force "$PROJECT_ROOT\$jmods_zip"
+}
 
 # Create Native EXE App
 Write-Host "Creating Native Windows EXE App..."
 $APP_DIR = "$DIST_DIR\LibraryAssistant-Windows"
 if (Test-Path $APP_DIR) { Remove-Item -Recurse -Force $APP_DIR }
 
-& jpackage --input $TEMP_ZIP_DIR --dest $DIST_DIR --name "LibraryAssistant-Windows" --main-jar $JAR_NAME --main-class library.assistant.ui.main.MainLauncher --java-options "-Dprism.order=sw" --add-modules java.se,jdk.unsupported,jdk.charsets --type app-image
+& jpackage --input $TEMP_ZIP_DIR --dest $DIST_DIR --name "LibraryAssistant-Windows" --main-jar $JAR_NAME --main-class library.assistant.ui.main.MainLauncher --java-options "-Dprism.order=sw" --module-path "$jmods_dir\javafx-jmods-17.0.10" --add-modules javafx.controls,javafx.fxml,javafx.graphics,javafx.base,javafx.media,javafx.web,javafx.swing,java.se,jdk.unsupported,jdk.charsets --type app-image
 
 # Package Native App into ZIP
 Write-Host "Packaging Native App into ZIP..."
