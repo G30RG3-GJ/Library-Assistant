@@ -98,7 +98,7 @@ Write-Host "Creating Native Windows EXE App..."
 $APP_DIR = "$DIST_DIR\LibraryAssistant-Windows"
 if (Test-Path $APP_DIR) { Remove-Item -Recurse -Force $APP_DIR }
 
-& jpackage --input $TEMP_ZIP_DIR --dest $DIST_DIR --name "LibraryAssistant-Windows" --main-jar $JAR_NAME --main-class library.assistant.ui.main.MainLauncher --java-options "-Dprism.order=sw" --module-path "$jmods_dir\javafx-jmods-17.0.10" --add-modules javafx.controls,javafx.fxml,javafx.graphics,javafx.base,javafx.media,javafx.web,javafx.swing,java.se,jdk.unsupported,jdk.charsets --type app-image
+& jpackage --input $TEMP_ZIP_DIR --dest $DIST_DIR --name "LibraryAssistant-Windows" --main-jar $JAR_NAME --main-class library.assistant.ui.main.MainLauncher --java-options "-Dprism.order=sw" --module-path "$jmods_dir\javafx-jmods-17.0.10" --add-modules javafx.controls,javafx.fxml,javafx.graphics,javafx.base,javafx.media,javafx.web,javafx.swing,java.se,jdk.unsupported,jdk.charsets --win-console --type app-image
 
 # Package Native App into ZIP
 Write-Host "Packaging Native App into ZIP..."
