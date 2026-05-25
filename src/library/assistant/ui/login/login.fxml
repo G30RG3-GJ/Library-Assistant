@@ -7,8 +7,12 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" prefHeight="367.0" prefWidth="419.0" stylesheets="@../../../../resources/dark-theme.css" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="library.assistant.ui.login.LoginController">
+<AnchorPane fx:id="rootPane" id="AnchorPane" prefHeight="367.0" prefWidth="419.0" stylesheets="@../../../../resources/dark-theme.css" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="library.assistant.ui.login.LoginController">
    <children>
+      <AnchorPane fx:id="bgCircle1" layoutX="-80.0" layoutY="-80.0" prefHeight="250.0" prefWidth="250.0" styleClass="parallax-bg-1" />
+      <AnchorPane fx:id="bgCircle2" layoutX="230.0" layoutY="180.0" prefHeight="220.0" prefWidth="220.0" styleClass="parallax-bg-2" />
+      <AnchorPane fx:id="bgCircle3" layoutX="150.0" layoutY="50.0" prefHeight="150.0" prefWidth="150.0" styleClass="parallax-bg-3" />
+      <AnchorPane layoutX="35.0" layoutY="35.0" prefHeight="297.0" prefWidth="349.0" styleClass="login-card" />
       <JFXTextField fx:id="username" labelFloat="true" layoutX="95.0" layoutY="122.0" prefHeight="33.0" prefWidth="259.0" promptText="Username">
          <font>
             <Font size="16.0" />

@@ -1,19 +1,23 @@
 /* 
     Created on : 11 Nov, 2017, 4:42:53 AM
     Author     : afsal villan
+    Redesigned in premium Parallax & Glassmorphic Style by Antigravity
 */
 
 * {
-    -fx-primary : #2A2E37;
-    -fx-secondary : #FFFF8D;
-    -fx-primarytext : #B2B2B2;
-    -fx-blue: #1976D2;
-    -fx-red: #FF0000;
-    -fx-color-1:#1976D2;
+    -fx-primary : #0d1117; /* Slate dark background */
+    -fx-secondary : #f5b041; /* Neon amber accent */
+    -fx-primarytext : #c9d1d9; /* Clean soft white text */
+    -fx-blue: #58a6ff; /* Cyan accent */
+    -fx-red: #ff7b72; /* Pastel red error */
+    -fx-color-1:#58a6ff;
+    -fx-glass-bg: rgba(22, 27, 34, 0.75); /* Glassmorphic card fill */
+    -fx-glass-border: rgba(240, 246, 252, 0.1); /* Frosted white border */
 }
 
 .root{
     -fx-background-color: -fx-primary;
+    -fx-font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
 }
 
 .glyph-icon
@@ -23,34 +27,73 @@
 
 .button{
     -fx-text-fill: -fx-primarytext;
-    -fx-background-color: -fx-primary;
-    -fx-border-color: -fx-secondary;
-    -fx-border-radius: 20px;
-    -fx-background-radius: 20px;
-    -fx-font-size: 12pt;
+    -fx-background-color: -fx-glass-bg;
+    -fx-border-color: -fx-glass-border;
+    -fx-border-radius: 24px;
+    -fx-background-radius: 24px;
+    -fx-font-size: 11pt;
+    -fx-font-weight: bold;
+    -fx-padding: 8px 20px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.25), 10, 0, 0, 4);
 }
 
 .button:hover, .button:focused{
     -fx-border-color: -fx-secondary;
     -fx-background-color: -fx-secondary;
     -fx-text-fill: -fx-primary;
+    -fx-effect: dropshadow(three-pass-box, rgba(245, 176, 65, 0.4), 15, 0, 0, 0);
 }
 
-.text-field
+.text-field, .password-field
 {
-    -fx-text-fill: -fx-primarytext;
+    -fx-text-fill: white;
     -fx-font-size : 12pt;
     -jfx-focus-color: -fx-secondary;
-    -fx-text-fill: derive(-fx-secondary, 20%);
+    -jfx-unfocus-color: -fx-glass-border;
+    -fx-prompt-text-fill: #8b949e;
 }
 
-/*Login Screen Specific*/
-
-
+/* Login Screen Specific */
 .wrong-credentials
 {
-    -jfx-unfocus-color: #ef5350;
-    -jfx-focus-color: #ef5350;
+    -jfx-unfocus-color: -fx-red;
+    -jfx-focus-color: -fx-red;
+    -fx-prompt-text-fill: -fx-red;
+}
+
+/* Parallax Background Orbs */
+.parallax-bg-1 {
+    -fx-background-color: linear-gradient(to bottom right, rgba(88, 166, 255, 0.15), rgba(110, 64, 201, 0.05));
+    -fx-background-radius: 50%;
+    -fx-effect: gaussian(rgba(88, 166, 255, 0.25), 100, 0, 0, 0);
+}
+
+.parallax-bg-2 {
+    -fx-background-color: linear-gradient(to bottom right, rgba(245, 176, 65, 0.12), rgba(255, 123, 114, 0.03));
+    -fx-background-radius: 50%;
+    -fx-effect: gaussian(rgba(245, 176, 65, 0.2), 90, 0, 0, 0);
+}
+
+.parallax-bg-3 {
+    -fx-background-color: linear-gradient(to bottom right, rgba(56, 139, 253, 0.1), rgba(139, 148, 158, 0.02));
+    -fx-background-radius: 50%;
+    -fx-effect: gaussian(rgba(56, 139, 253, 0.15), 70, 0, 0, 0);
+}
+
+.login-card {
+    -fx-background-color: -fx-glass-bg;
+    -fx-border-color: -fx-glass-border;
+    -fx-background-radius: 16px;
+    -fx-border-radius: 16px;
+    -fx-border-width: 1px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.5), 30, 0, 0, 10);
+}
+
+.login-button {
+    -fx-background-color: -fx-glass-bg;
+    -fx-border-color: -fx-glass-border;
+    -fx-border-radius: 20px;
+    -fx-background-radius: 20px;
 }
 
 /*Main Screen CSS Styling starts here*/

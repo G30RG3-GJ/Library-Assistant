@@ -21,10 +21,20 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javafx.scene.layout.AnchorPane;
+
 public class LoginController implements Initializable {
 
     private final static Logger LOGGER = LogManager.getLogger(LoginController.class.getName());
 
+    @FXML
+    private AnchorPane rootPane;
+    @FXML
+    private AnchorPane bgCircle1;
+    @FXML
+    private AnchorPane bgCircle2;
+    @FXML
+    private AnchorPane bgCircle3;
     @FXML
     private JFXTextField username;
     @FXML
@@ -35,6 +45,26 @@ public class LoginController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         preference = Preferences.getPreferences();
+        
+        // Implement interactive mouse-move parallax effect
+        rootPane.setOnMouseMoved(event -> {
+            double x = event.getSceneX();
+            double y = event.getSceneY();
+            
+            // Compute offset from center of the window (419 x 367)
+            double dx = x - 210.0;
+            double dy = y - 184.0;
+            
+            // Smoothly translate background shapes at different speeds
+            bgCircle1.setTranslateX(dx * 0.06);
+            bgCircle1.setTranslateY(dy * 0.06);
+            
+            bgCircle2.setTranslateX(-dx * 0.08);
+            bgCircle2.setTranslateY(-dy * 0.08);
+            
+            bgCircle3.setTranslateX(dx * 0.03);
+            bgCircle3.setTranslateY(-dy * 0.03);
+        });
     }
 
     @FXML

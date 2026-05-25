@@ -1,6 +1,6 @@
 
 # Set paths
-$PROJECT_ROOT = "d:\lib\Library-Assistant"
+$PROJECT_ROOT = $PSScriptRoot
 $SRC_DIR = "$PROJECT_ROOT\src"
 $LIB_DIR = "$PROJECT_ROOT\libs"
 $BUILD_DIR = "$PROJECT_ROOT\build\classes"
@@ -57,7 +57,7 @@ if ($LASTEXITCODE -eq 0) {
     Write-Host "Running application..."
     
     # Run application
-    & $JAVA_EXE -cp "$CLASSPATH" library.assistant.ui.main.Main
+    & $JAVA_EXE -cp "$CLASSPATH" library.assistant.ui.main.MainLauncher
 }
 else {
     Write-Host "Compilation failed."

@@ -1,11 +1,11 @@
 
 # Set paths
-$PROJECT_ROOT = "d:\lib\Library-Assistant"
+$PROJECT_ROOT = $PSScriptRoot
 $SRC_DIR = "$PROJECT_ROOT\src"
 $LIB_DIR = "$PROJECT_ROOT\libs"
 $BUILD_DIR = "$PROJECT_ROOT\build\classes"
 $DIST_DIR = "$PROJECT_ROOT\dist"
-$VERSION = "1.0.0"
+$VERSION = "1.2.0"
 
 # Clean build and dist
 if (Test-Path $BUILD_DIR) { Remove-Item -Recurse -Force $BUILD_DIR }
@@ -35,16 +35,31 @@ if ($LASTEXITCODE -ne 0) {
 
 # Create Manifest
 $MANIFEST_PATH = "$PROJECT_ROOT\manifest.mf"
-$MANIFEST_CONTENT = "Manifest-Version: 1.0`nMain-Class: library.assistant.ui.main.Main`nClass-Path: "
-# Add libs to Class-Path in manifest (relative path)
 $LIB_NAMES = Get-ChildItem "$LIB_DIR\*.jar" | ForEach-Object { "libs/" + $_.Name }
-$MANIFEST_CONTENT += ($LIB_NAMES -join " ") + "`n"
+
+$WRAPPED_CLASS_PATH = ""
+$CURRENT_LINE = "Class-Path: "
+foreach ($item in $LIB_NAMES) {
+    if (($CURRENT_LINE.Length + $item.Length + 1) -gt 70) {
+        $WRAPPED_CLASS_PATH += $CURRENT_LINE + "`r`n"
+        $CURRENT_LINE = " " + $item
+    } else {
+        if ($CURRENT_LINE -eq "Class-Path: ") {
+            $CURRENT_LINE += $item
+        } else {
+            $CURRENT_LINE += " " + $item
+        }
+    }
+}
+$WRAPPED_CLASS_PATH += $CURRENT_LINE + "`r`n"
+
+$MANIFEST_CONTENT = "Manifest-Version: 1.0`r`nMain-Class: library.assistant.ui.main.MainLauncher`r`n" + $WRAPPED_CLASS_PATH
 $MANIFEST_CONTENT | Out-File $MANIFEST_PATH -Encoding ASCII
 
 # Create JAR
 Write-Host "Creating JAR..."
 $JAR_NAME = "LibraryAssistant.jar"
-& jar camf "$MANIFEST_PATH" "$DIST_DIR\$JAR_NAME" -C "$BUILD_DIR" .
+& jar cmf "$MANIFEST_PATH" "$DIST_DIR\$JAR_NAME" -C "$BUILD_DIR" .
 
 # Package into ZIP
 Write-Host "Packaging into ZIP..."
