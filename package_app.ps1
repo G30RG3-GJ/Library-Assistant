@@ -78,7 +78,20 @@ Copy-Item "$LIB_DIR\*" -Destination "$TEMP_ZIP_DIR\libs" -Recurse
 # Zip it
 Compress-Archive -Path "$TEMP_ZIP_DIR\*" -DestinationPath $ZIP_PATH -Force
 
-# Cleanup temp
+# Create Native EXE App
+Write-Host "Creating Native Windows EXE App..."
+$APP_DIR = "$DIST_DIR\LibraryAssistant-Windows"
+if (Test-Path $APP_DIR) { Remove-Item -Recurse -Force $APP_DIR }
+
+& jpackage --input $TEMP_ZIP_DIR --dest $DIST_DIR --name "LibraryAssistant-Windows" --main-jar $JAR_NAME --main-class library.assistant.ui.main.MainLauncher --java-options "-Dprism.order=sw" --type app-image
+
+# Package Native App into ZIP
+Write-Host "Packaging Native App into ZIP..."
+$EXE_ZIP_NAME = "LibraryAssistant-v$VERSION-Windows-EXE.zip"
+Compress-Archive -Path "$APP_DIR\*" -DestinationPath "$DIST_DIR\$EXE_ZIP_NAME" -Force
+
+# Cleanup temp folders
 Remove-Item -Recurse -Force $TEMP_ZIP_DIR
+Remove-Item -Recurse -Force $APP_DIR
 
 Write-Host "Build complete: $ZIP_PATH"
