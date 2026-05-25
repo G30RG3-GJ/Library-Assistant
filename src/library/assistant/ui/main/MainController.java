@@ -78,6 +78,10 @@ public class MainController implements Initializable, BookReturnCallback {
     @FXML
     private JFXTextField bookID;
     @FXML
+    private JFXTextField bookNameInput;
+    @FXML
+    private JFXTextField memberNameInput;
+    @FXML
     private StackPane rootPane;
     @FXML
     private JFXHamburger hamburger;
@@ -565,6 +569,16 @@ public class MainController implements Initializable, BookReturnCallback {
     @FXML
     private void handleMenuOverdueNotification(ActionEvent event) {
         LibraryAssistantUtil.loadWindow(getClass().getResource("/library/assistant/ui/notifoverdue/overdue_notification.fxml"), "Notify Users", null);
+    }
+
+    @FXML
+    private void loadBookInfoByName(ActionEvent event) {
+        // Optional search by name stub
+    }
+
+    @FXML
+    private void loadMemberInfoByName(ActionEvent event) {
+        // Optional search by name stub
     }
 
 }
