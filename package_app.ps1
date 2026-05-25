@@ -109,6 +109,13 @@ if (Test-Path $APP_DIR) { Remove-Item -Recurse -Force $APP_DIR }
     --java-options "--add-opens=javafx.base/com.sun.javafx.binding=ALL-UNNAMED" `
     --java-options "--add-opens=javafx.graphics/com.sun.javafx.stage=ALL-UNNAMED" `
     --java-options "--add-opens=javafx.base/com.sun.javafx.event=ALL-UNNAMED" `
+    --java-options "--add-opens=javafx.graphics/javafx.css=ALL-UNNAMED" `
+    --java-options "--add-opens=javafx.graphics/com.sun.javafx.css=ALL-UNNAMED" `
+    --java-options "--add-opens=javafx.graphics/javafx.scene.layout=ALL-UNNAMED" `
+    --java-options "--add-opens=javafx.graphics/com.sun.javafx.scene.layout=ALL-UNNAMED" `
+    --java-options "--add-opens=javafx.graphics/com.sun.javafx.geom=ALL-UNNAMED" `
+    --java-options "--add-opens=javafx.controls/javafx.scene.control=ALL-UNNAMED" `
+    --java-options "--add-opens=javafx.controls/com.sun.javafx.scene.control=ALL-UNNAMED" `
     --module-path "$jmods_dir\javafx-jmods-17.0.10" `
     --add-modules javafx.controls,javafx.fxml,javafx.graphics,javafx.base,javafx.media,javafx.web,javafx.swing,java.se,jdk.unsupported,jdk.charsets `
     --win-console --type app-image
