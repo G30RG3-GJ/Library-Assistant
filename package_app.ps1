@@ -100,6 +100,7 @@ if (Test-Path $APP_DIR) { Remove-Item -Recurse -Force $APP_DIR }
 
 & jpackage --input $TEMP_ZIP_DIR --dest $DIST_DIR --name "LibraryAssistant-Windows" --main-jar $JAR_NAME --main-class library.assistant.ui.main.MainLauncher `
     --java-options "-Dprism.order=sw" `
+    --java-options "--add-opens=java.base/java.lang.reflect=ALL-UNNAMED" `
     --java-options "--add-opens=javafx.controls/javafx.scene.control.skin=ALL-UNNAMED" `
     --java-options "--add-opens=javafx.graphics/javafx.scene=ALL-UNNAMED" `
     --java-options "--add-opens=javafx.controls/com.sun.javafx.scene.control.skin=ALL-UNNAMED" `
