@@ -57,7 +57,7 @@ if ($LASTEXITCODE -eq 0) {
     Write-Host "Running application..."
     
     # Run application
-    & $JAVA_EXE -cp "$CLASSPATH" library.assistant.ui.main.MainLauncher
+    & $JAVA_EXE -Dprism.order=sw -cp "$CLASSPATH" library.assistant.ui.main.MainLauncher
 }
 else {
     Write-Host "Compilation failed."
