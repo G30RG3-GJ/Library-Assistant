@@ -29,7 +29,7 @@ public class EncryptionUtil {
     private static final Lock LOCK = new ReentrantLock(true);
 
     public static String encrypt(String plainText) {
-        LOCK.tryLock();
+        LOCK.lock();
         try {
             CipherSpec spec = getCipherSpec();
             if (spec == null || !spec.isValid()) {
