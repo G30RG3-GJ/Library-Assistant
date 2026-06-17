@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.concurrent.Task;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -77,25 +78,38 @@ public class BookListController implements Initializable {
     private void loadData() {
         list.clear();
 
-        DatabaseHandler handler = DatabaseHandler.getInstance();
-        String qu = "SELECT * FROM BOOK";
-        ResultSet rs = handler.execQuery(qu);
-        try {
-            while (rs.next()) {
-                String titlex = rs.getString("title");
-                String author = rs.getString("author");
-                String id = rs.getString("id");
-                String publisher = rs.getString("publisher");
-                Boolean avail = rs.getBoolean("isAvail");
+        Task<List<Book>> task = new Task<List<Book>>() {
+            @Override
+            protected List<Book> call() throws Exception {
+                List<Book> bookList = new ArrayList<>();
+                DatabaseHandler handler = DatabaseHandler.getInstance();
+                String qu = "SELECT * FROM BOOK";
+                ResultSet rs = handler.execQuery(qu);
+                while (rs.next()) {
+                    String titlex = rs.getString("title");
+                    String author = rs.getString("author");
+                    String id = rs.getString("id");
+                    String publisher = rs.getString("publisher");
+                    Boolean avail = rs.getBoolean("isAvail");
 
-                list.add(new Book(titlex, id, author, publisher, avail));
-
+                    bookList.add(new Book(titlex, id, author, publisher, avail));
+                }
+                return bookList;
             }
-        } catch (SQLException ex) {
-            Logger.getLogger(BookAddController.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        };
 
-        tableView.setItems(list);
+        task.setOnSucceeded(e -> {
+            list.setAll(task.getValue());
+            tableView.setItems(list);
+        });
+
+        task.setOnFailed(e -> {
+            Logger.getLogger(BookListController.class.getName()).log(Level.SEVERE, "Failed to load books", task.getException());
+        });
+
+        Thread thread = new Thread(task);
+        thread.setDaemon(true);
+        thread.start();
     }
 
     @FXML
