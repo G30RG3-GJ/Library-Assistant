@@ -118,8 +118,6 @@ public final class DatabaseHandler {
             System.out.println("Exception at execQuery:dataHandler" + ex.getLocalizedMessage());
             return null;
         }
-        finally {
-        }
         return result;
     }
 
@@ -133,8 +131,6 @@ public final class DatabaseHandler {
             JOptionPane.showMessageDialog(null, "Error:" + ex.getMessage(), "Error Occured", JOptionPane.ERROR_MESSAGE);
             System.out.println("Exception at execQuery:dataHandler" + ex.getLocalizedMessage());
             return false;
-        }
-        finally {
         }
     }
 
