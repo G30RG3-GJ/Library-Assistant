@@ -47,10 +47,10 @@ import library.assistant.util.LibraryAssistantUtil;
 
 public class MainController implements Initializable, BookReturnCallback {
 
-    private static final String BOOK_NOT_AVAILABLE = "Not Available";
-    private static final String NO_SUCH_BOOK_AVAILABLE = "No Such Book Available";
-    private static final String NO_SUCH_MEMBER_AVAILABLE = "No Such Member Available";
-    private static final String BOOK_AVAILABLE = "Available";
+    private String bookAvailable = "Available";
+    private String bookNotAvailable = "Not Available";
+    private String noSuchBookAvailable = "No Such Book Available";
+    private String noSuchMemberAvailable = "No Such Member Available";
 
     private Boolean isReadyForSubmission = false;
     private DatabaseHandler databaseHandler;
@@ -128,6 +128,15 @@ public class MainController implements Initializable, BookReturnCallback {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        try {
+            ResourceBundle bundle = ResourceBundle.getBundle("resources.strings");
+            bookAvailable = bundle.getString("book.available");
+            bookNotAvailable = bundle.getString("book.not.available");
+            noSuchBookAvailable = bundle.getString("no.such.book.available");
+            noSuchMemberAvailable = bundle.getString("no.such.member.available");
+        } catch (Exception e) {
+            Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, e);
+        }
         databaseHandler = DatabaseHandler.getInstance();
 
         initDrawer();
@@ -152,7 +161,7 @@ public class MainController implements Initializable, BookReturnCallback {
 
                 bookName.setText(bName);
                 bookAuthor.setText(bAuthor);
-                String status = (bStatus) ? BOOK_AVAILABLE : String.format("Issued on %s", LibraryAssistantUtil.getDateString(new Date(issuedOn.getTime())));
+                String status = (bStatus) ? bookAvailable : String.format("Issued on %s", LibraryAssistantUtil.getDateString(new Date(issuedOn.getTime())));
                 if (!bStatus) {
                     bookStatus.getStyleClass().add("not-available");
                 } else {
@@ -164,7 +173,7 @@ public class MainController implements Initializable, BookReturnCallback {
             }
 
             if (!flag) {
-                bookName.setText(NO_SUCH_BOOK_AVAILABLE);
+                bookName.setText(noSuchBookAvailable);
             } else {
                 memberIDInput.requestFocus();
             }
@@ -206,7 +215,7 @@ public class MainController implements Initializable, BookReturnCallback {
             }
 
             if (!flag) {
-                memberName.setText(NO_SUCH_MEMBER_AVAILABLE);
+                memberName.setText(noSuchMemberAvailable);
             } else {
                 btnIssue.requestFocus();
             }
@@ -222,7 +231,7 @@ public class MainController implements Initializable, BookReturnCallback {
             AlertMaker.showMaterialDialog(rootPane, rootAnchorPane, Arrays.asList(btn), "Invalid Input", null);
             return;
         }
-        if (bookStatus.getText().equals(BOOK_NOT_AVAILABLE)) {
+        if (bookStatus.getText().equals(bookNotAvailable)) {
             JFXButton btn = new JFXButton("Okay!");
             JFXButton viewDetails = new JFXButton("View Details");
             viewDetails.addEventHandler(MouseEvent.MOUSE_CLICKED, (MouseEvent e) -> {
@@ -541,7 +550,7 @@ public class MainController implements Initializable, BookReturnCallback {
         memberIDInput.fireEvent(new ActionEvent());
         return bookIDInput.getText().isEmpty() || memberIDInput.getText().isEmpty()
                 || memberName.getText().isEmpty() || bookName.getText().isEmpty()
-                || bookName.getText().equals(NO_SUCH_BOOK_AVAILABLE) || memberName.getText().equals(NO_SUCH_MEMBER_AVAILABLE);
+                || bookName.getText().equals(noSuchBookAvailable) || memberName.getText().equals(noSuchMemberAvailable);
     }
 
     @Override
