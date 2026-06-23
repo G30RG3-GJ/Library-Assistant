@@ -138,6 +138,19 @@ public final class DatabaseHandler {
         }
     }
 
+    public boolean execUpdate(String query, Object... params) {
+        try (PreparedStatement statement = conn.prepareStatement(query)) {
+            for (int i = 0; i < params.length; i++) {
+                statement.setObject(i + 1, params[i]);
+            }
+            statement.executeUpdate();
+            return true;
+        } catch (SQLException ex) {
+            LOGGER.log(Level.ERROR, "{}", ex);
+            return false;
+        }
+    }
+
     public boolean deleteBook(Book book) {
         try {
             String deleteStatement = "DELETE FROM BOOK WHERE ID = ?";
