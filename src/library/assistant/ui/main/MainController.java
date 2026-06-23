@@ -277,16 +277,7 @@ public class MainController implements Initializable, BookReturnCallback {
 
         try {
             String id = bookID.getText();
-            String myQuery = "SELECT ISSUE.bookID, ISSUE.memberID, ISSUE.issueTime, ISSUE.renew_count,\n"
-                    + "MEMBER.name, MEMBER.mobile, MEMBER.email,\n"
-                    + "BOOK.title, BOOK.author, BOOK.publisher\n"
-                    + "FROM ISSUE\n"
-                    + "LEFT JOIN MEMBER\n"
-                    + "ON ISSUE.memberID=MEMBER.ID\n"
-                    + "LEFT JOIN BOOK\n"
-                    + "ON ISSUE.bookID=BOOK.ID\n"
-                    + "WHERE ISSUE.bookID='" + id + "'";
-            ResultSet rs = databaseHandler.execQuery(myQuery);
+            ResultSet rs = DataHelper.getIssueDetails(id);
             if (rs.next()) {
                 memberNameHolder.setText(rs.getString("name"));
                 memberContactHolder.setText(rs.getString("mobile"));

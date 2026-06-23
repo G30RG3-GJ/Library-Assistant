@@ -64,4 +64,23 @@ public class DataHelperTest {
         // Assert
         assertFalse(result);
     }
+
+    @Test
+    public void testGetIssueDetails() throws SQLException {
+        // Arrange
+        Connection mockConn = mock(Connection.class);
+        PreparedStatement mockStmt = mock(PreparedStatement.class);
+        String bookID = "B100";
+
+        when(mockConn.prepareStatement(anyString())).thenReturn(mockStmt);
+
+        // Act
+        DataHelper.getIssueDetails(bookID, mockConn);
+
+        // Assert
+        String expectedQueryPart = "WHERE ISSUE.bookID=?";
+        verify(mockConn).prepareStatement(argThat(sql -> sql != null && sql.contains(expectedQueryPart)));
+        verify(mockStmt).setString(1, bookID);
+        verify(mockStmt).executeQuery();
+    }
 }
