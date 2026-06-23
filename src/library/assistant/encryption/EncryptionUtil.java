@@ -69,7 +69,7 @@ public class EncryptionUtil {
             byte[] encrypted = cipher.doFinal(value.getBytes());
             return Base64.encodeBase64String(encrypted);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.ERROR, "Encryption failure", ex);
         }
 
         return null;
@@ -87,7 +87,7 @@ public class EncryptionUtil {
 
             return new String(original);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.ERROR, "Encryption failure", ex);
         }
 
         return null;
