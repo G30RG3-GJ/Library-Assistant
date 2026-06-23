@@ -25,9 +25,8 @@ public class DataHelper {
     }
 
     public static boolean insertNewBook(Book book, Connection conn) {
-        try {
-            PreparedStatement statement = conn.prepareStatement(
-                    "INSERT INTO BOOK(id,title,author,publisher,isAvail) VALUES(?,?,?,?,?)");
+        try (PreparedStatement statement = conn.prepareStatement(
+                "INSERT INTO BOOK(id,title,author,publisher,isAvail) VALUES(?,?,?,?,?)")) {
             statement.setString(1, book.getId());
             statement.setString(2, book.getTitle());
             statement.setString(3, book.getAuthor());
