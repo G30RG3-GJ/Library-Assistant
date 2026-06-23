@@ -34,6 +34,9 @@ import library.assistant.database.DatabaseHandler;
 import library.assistant.ui.notifoverdue.emailsender.EmailSenderController;
 import library.assistant.ui.settings.Preferences;
 import library.assistant.util.LibraryAssistantUtil;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * FXML Controller class
@@ -41,6 +44,8 @@ import library.assistant.util.LibraryAssistantUtil;
  * @author Villan
  */
 public class OverdueNotificationController implements Initializable {
+
+    private final static Logger LOGGER = LogManager.getLogger(OverdueNotificationController.class.getName());
 
     private ObservableList<NotificationItem> list = FXCollections.observableArrayList();
     @FXML
@@ -108,7 +113,7 @@ public class OverdueNotificationController implements Initializable {
                 String bookID = rs.getString("bookID");
                 String bookTitle = rs.getString("title");
                 Timestamp issueTime = rs.getTimestamp("issueTime");
-                System.out.println("Issued on " + issueTime);
+                LOGGER.log(Level.INFO, "Issued on {}", issueTime);
                 Integer days = Math.toIntExact(TimeUnit.MILLISECONDS.toDays(System.currentTimeMillis() - issueTime.getTime())) + 1;
                 Float fine = LibraryAssistantUtil.getFineAmount(days);
 
@@ -116,7 +121,7 @@ public class OverdueNotificationController implements Initializable {
                 list.add(item);
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.ERROR, "{}", ex);
         }
     }
 
@@ -141,9 +146,9 @@ public class OverdueNotificationController implements Initializable {
             ((Stage) rootPane.getScene().getWindow()).close();
         });
         MailServerInfo mailServerInfo = DataHelper.loadMailServerInfo();
-        System.out.println(mailServerInfo);
+        LOGGER.log(Level.INFO, "{}", mailServerInfo);
         if (mailServerInfo == null || !mailServerInfo.validate()) {
-            System.out.println("Mail server not configured");
+            LOGGER.log(Level.INFO, "Mail server not configured");
             AlertMaker.showMaterialDialog(rootPane, contentPane, ImmutableList.of(button), "Mail server is not configured", "Please configure mail server first.\nIt is available under Settings");
         }
     }
