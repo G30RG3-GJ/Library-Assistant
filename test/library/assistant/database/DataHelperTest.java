@@ -64,4 +64,72 @@ public class DataHelperTest {
         // Assert
         assertFalse(result);
     }
+
+    @Test
+    public void testIssueBookSuccess() throws SQLException {
+        // Arrange
+        Connection mockConn = mock(Connection.class);
+        PreparedStatement mockInsertStmt = mock(PreparedStatement.class);
+        PreparedStatement mockUpdateStmt = mock(PreparedStatement.class);
+
+        when(mockConn.prepareStatement(contains("INSERT INTO ISSUE"))).thenReturn(mockInsertStmt);
+        when(mockConn.prepareStatement(contains("UPDATE BOOK"))).thenReturn(mockUpdateStmt);
+
+        when(mockInsertStmt.executeUpdate()).thenReturn(1);
+        when(mockUpdateStmt.executeUpdate()).thenReturn(1);
+
+        // Act
+        boolean result = DataHelper.issueBook("M001", "B001", mockConn);
+
+        // Assert
+        assertTrue(result);
+        verify(mockConn).setAutoCommit(false);
+        verify(mockInsertStmt).setString(1, "M001");
+        verify(mockInsertStmt).setString(2, "B001");
+        verify(mockUpdateStmt).setString(1, "B001");
+        verify(mockConn).commit();
+        verify(mockConn).setAutoCommit(true);
+    }
+
+    @Test
+    public void testIssueBookFailure() throws SQLException {
+        // Arrange
+        Connection mockConn = mock(Connection.class);
+        PreparedStatement mockInsertStmt = mock(PreparedStatement.class);
+
+        when(mockConn.prepareStatement(contains("INSERT INTO ISSUE"))).thenReturn(mockInsertStmt);
+        when(mockInsertStmt.executeUpdate()).thenReturn(0); // Insert fails
+
+        // Act
+        boolean result = DataHelper.issueBook("M001", "B001", mockConn);
+
+        // Assert
+        assertFalse(result);
+        verify(mockConn).setAutoCommit(false);
+        verify(mockConn).rollback();
+        verify(mockConn).setAutoCommit(true);
+    }
+
+    @Test
+    public void testIssueBookPartialFailure() throws SQLException {
+        // Arrange
+        Connection mockConn = mock(Connection.class);
+        PreparedStatement mockInsertStmt = mock(PreparedStatement.class);
+        PreparedStatement mockUpdateStmt = mock(PreparedStatement.class);
+
+        when(mockConn.prepareStatement(contains("INSERT INTO ISSUE"))).thenReturn(mockInsertStmt);
+        when(mockConn.prepareStatement(contains("UPDATE BOOK"))).thenReturn(mockUpdateStmt);
+
+        when(mockInsertStmt.executeUpdate()).thenReturn(1); // Insert succeeds
+        when(mockUpdateStmt.executeUpdate()).thenReturn(0); // Update fails
+
+        // Act
+        boolean result = DataHelper.issueBook("M001", "B001", mockConn);
+
+        // Assert
+        assertFalse(result);
+        verify(mockConn).setAutoCommit(false);
+        verify(mockConn).rollback();
+        verify(mockConn).setAutoCommit(true);
+    }
 }

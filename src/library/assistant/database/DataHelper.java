@@ -55,6 +55,47 @@ public class DataHelper {
         return false;
     }
 
+    public static boolean issueBook(String memberID, String bookID) {
+        return issueBook(memberID, bookID, DatabaseHandler.getInstance().getConnection());
+    }
+
+    public static boolean issueBook(String memberID, String bookID, Connection conn) {
+        try {
+            conn.setAutoCommit(false);
+            String insertIssue = "INSERT INTO ISSUE(memberID,bookID) VALUES (?, ?)";
+            try (PreparedStatement insertStmt = conn.prepareStatement(insertIssue)) {
+                insertStmt.setString(1, memberID);
+                insertStmt.setString(2, bookID);
+                if (insertStmt.executeUpdate() > 0) {
+                    String updateBook = "UPDATE BOOK SET isAvail = false WHERE id = ?";
+                    try (PreparedStatement updateStmt = conn.prepareStatement(updateBook)) {
+                        updateStmt.setString(1, bookID);
+                        if (updateStmt.executeUpdate() > 0) {
+                            conn.commit();
+                            return true;
+                        }
+                    }
+                }
+            }
+            conn.rollback();
+            return false;
+        } catch (SQLException ex) {
+            try {
+                conn.rollback();
+            } catch (SQLException e) {
+                LOGGER.log(Level.ERROR, "Rollback failed", e);
+            }
+            LOGGER.log(Level.ERROR, "{}", ex);
+            return false;
+        } finally {
+            try {
+                conn.setAutoCommit(true);
+            } catch (SQLException e) {
+                LOGGER.log(Level.ERROR, "Failed to restore auto-commit", e);
+            }
+        }
+    }
+
     public static boolean isBookExists(String id) {
         try {
             String checkstmt = "SELECT COUNT(*) FROM BOOK WHERE id=?";
