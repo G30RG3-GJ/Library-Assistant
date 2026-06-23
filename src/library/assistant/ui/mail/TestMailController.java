@@ -35,7 +35,10 @@ public class TestMailController implements Initializable, GenericCallback {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // TODO
+        if (recepientAddressInput == null || progressBar == null) {
+            LOGGER.log(Level.ERROR, "FXML fields were not injected correctly.");
+        }
+        Platform.runLater(() -> recepientAddressInput.requestFocus());
     }
 
     public void setMailServerInfo(MailServerInfo mailServerInfo) {
