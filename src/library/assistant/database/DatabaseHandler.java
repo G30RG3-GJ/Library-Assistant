@@ -240,10 +240,6 @@ public final class DatabaseHandler {
         return false;
     }
 
-    public static void main(String[] args) throws Exception {
-        DatabaseHandler.getInstance();
-    }
-
     public ObservableList<PieChart.Data> getBookGraphStatistics() {
         ObservableList<PieChart.Data> data = FXCollections.observableArrayList();
         try {
