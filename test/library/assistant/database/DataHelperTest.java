@@ -3,6 +3,7 @@ package library.assistant.database;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Statement;
 import library.assistant.data.model.Book;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -63,5 +64,40 @@ public class DataHelperTest {
 
         // Assert
         assertFalse(result);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testWipeTableSQLInjection() throws SQLException {
+        // Arrange
+        Connection mockConn = mock(Connection.class);
+        Statement mockStmt = mock(Statement.class);
+
+        // Setup the stub DatabaseHandler with the mock connection
+        DatabaseHandler.getInstance().setConnection(mockConn);
+
+        when(mockConn.createStatement()).thenReturn(mockStmt);
+
+        // Act
+        // Trying to inject SQL. This should throw IllegalArgumentException
+        String maliciousTableName = "BOOK; DROP TABLE MEMBER; --";
+        DataHelper.wipeTable(maliciousTableName);
+    }
+
+    @Test
+    public void testWipeTableValid() throws SQLException {
+        // Arrange
+        Connection mockConn = mock(Connection.class);
+        Statement mockStmt = mock(Statement.class);
+
+        // Setup the stub DatabaseHandler with the mock connection
+        DatabaseHandler.getInstance().setConnection(mockConn);
+
+        when(mockConn.createStatement()).thenReturn(mockStmt);
+
+        // Act
+        DataHelper.wipeTable("BOOK");
+
+        // Assert
+        verify(mockStmt).execute("DELETE FROM BOOK WHERE TRUE");
     }
 }
