@@ -191,8 +191,8 @@ public class MainController implements Initializable, BookReturnCallback {
         enableDisableGraph(false);
 
         String id = memberIDInput.getText();
-        String qu = "SELECT * FROM MEMBER WHERE id = '" + id + "'";
-        ResultSet rs = databaseHandler.execQuery(qu);
+        String qu = "SELECT * FROM MEMBER WHERE id = ?";
+        ResultSet rs = databaseHandler.execQuery(qu, id);
         Boolean flag = false;
         try {
             while (rs.next()) {
