@@ -303,9 +303,10 @@ public class MainController implements Initializable, BookReturnCallback {
                 Long days = TimeUnit.DAYS.convert(timeElapsed, TimeUnit.MILLISECONDS) + 1;
                 String daysElapsed = String.format("Used %d days", days);
                 numberDaysHolder.setText(daysElapsed);
-                Float fine = LibraryAssistantUtil.getFineAmount(days.intValue());
+                Preferences pref = Preferences.getPreferences();
+                Float fine = LibraryAssistantUtil.getFineAmount(days.intValue(), pref);
                 if (fine > 0) {
-                    fineInfoHolder.setText(String.format("Fine : %.2f", LibraryAssistantUtil.getFineAmount(days.intValue())));
+                    fineInfoHolder.setText(String.format("Fine : %.2f", fine));
                 } else {
                     fineInfoHolder.setText("");
                 }

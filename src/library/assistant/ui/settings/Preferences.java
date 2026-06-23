@@ -14,6 +14,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 public class Preferences {
 
     public static final String CONFIG_FILE = "config.txt";
+    private static Preferences instance;
 
     int nDaysWithoutFine;
     float finePerDay;
@@ -69,6 +70,7 @@ public class Preferences {
             Gson gson = new Gson();
             writer = new FileWriter(CONFIG_FILE);
             gson.toJson(preference, writer);
+            instance = preference;
         } catch (IOException ex) {
             Logger.getLogger(Preferences.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
@@ -80,16 +82,17 @@ public class Preferences {
         }
     }
 
-    public static Preferences getPreferences() {
-        Gson gson = new Gson();
-        Preferences preferences = new Preferences();
-        try {
-            preferences = gson.fromJson(new FileReader(CONFIG_FILE), Preferences.class);
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(Preferences.class.getName()).info("Config file is missing. Creating new one with default config");
-            initConfig();
+    public static synchronized Preferences getPreferences() {
+        if (instance == null) {
+            Gson gson = new Gson();
+            try {
+                instance = gson.fromJson(new FileReader(CONFIG_FILE), Preferences.class);
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(Preferences.class.getName()).info("Config file is missing. Creating new one with default config");
+                initConfig();
+            }
         }
-        return preferences;
+        return instance;
     }
 
     public static void writePreferenceToFile(Preferences preference) {
@@ -98,6 +101,7 @@ public class Preferences {
             Gson gson = new Gson();
             writer = new FileWriter(CONFIG_FILE);
             gson.toJson(preference, writer);
+            instance = preference;
 
             AlertMaker.showSimpleAlert("Success", "Settings updated");
         } catch (IOException ex) {
