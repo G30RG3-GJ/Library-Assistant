@@ -2,6 +2,7 @@ package library.assistant.database;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import library.assistant.data.model.Book;
 import org.junit.Test;
@@ -63,5 +64,38 @@ public class DataHelperTest {
 
         // Assert
         assertFalse(result);
+    }
+
+    @Test
+    public void testGetIssueDetails() throws SQLException {
+        // Arrange
+        Connection mockConn = mock(Connection.class);
+        PreparedStatement mockStmt = mock(PreparedStatement.class);
+        ResultSet mockRs = mock(ResultSet.class);
+        String bookID = "B100";
+
+        when(mockConn.prepareStatement(anyString())).thenReturn(mockStmt);
+        when(mockStmt.executeQuery()).thenReturn(mockRs);
+
+        // Act
+        ResultSet result = DataHelper.getIssueDetails(bookID, mockConn);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(mockRs, result);
+        verify(mockStmt).setString(1, bookID);
+        verify(mockStmt).executeQuery();
+    }
+
+    @Test(expected = SQLException.class)
+    public void testGetIssueDetailsException() throws SQLException {
+        // Arrange
+        Connection mockConn = mock(Connection.class);
+        String bookID = "B100";
+
+        when(mockConn.prepareStatement(anyString())).thenThrow(new SQLException("DB Error"));
+
+        // Act
+        DataHelper.getIssueDetails(bookID, mockConn);
     }
 }
