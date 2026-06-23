@@ -90,7 +90,7 @@ public final class DatabaseHandler {
         }
         catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Cant load database", "Database Error", JOptionPane.ERROR_MESSAGE);
-            System.exit(0);
+            throw new RuntimeException("Cant load database", e);
         }
     }
 
