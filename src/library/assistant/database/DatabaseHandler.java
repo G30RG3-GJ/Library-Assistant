@@ -59,7 +59,7 @@ public final class DatabaseHandler {
             System.out.println("Already loaded tables " + loadedTables);
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            Document doc = dBuilder.parse(DatabaseHandler.class.getClass().getResourceAsStream("/resources/database/tables.xml"));
+            Document doc = dBuilder.parse(DatabaseHandler.class.getResourceAsStream("/resources/database/tables.xml"));
             NodeList nList = doc.getElementsByTagName("table-entry");
             for (int i = 0; i < nList.getLength(); i++) {
                 Node nNode = nList.item(i);
@@ -155,21 +155,7 @@ public final class DatabaseHandler {
     }
 
     public boolean isBookAlreadyIssued(Book book) {
-        try {
-            String checkstmt = "SELECT COUNT(*) FROM ISSUE WHERE bookid=?";
-            PreparedStatement stmt = conn.prepareStatement(checkstmt);
-            stmt.setString(1, book.getId());
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                int count = rs.getInt(1);
-                System.out.println(count);
-                return (count > 0);
-            }
-        }
-        catch (SQLException ex) {
-            LOGGER.log(Level.ERROR, "{}", ex);
-        }
-        return false;
+        return checkRecordExists("ISSUE", "bookid", book.getId());
     }
 
     public boolean deleteMember(MemberListController.Member member) {
@@ -189,21 +175,7 @@ public final class DatabaseHandler {
     }
 
     public boolean isMemberHasAnyBooks(MemberListController.Member member) {
-        try {
-            String checkstmt = "SELECT COUNT(*) FROM ISSUE WHERE memberID=?";
-            PreparedStatement stmt = conn.prepareStatement(checkstmt);
-            stmt.setString(1, member.getId());
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                int count = rs.getInt(1);
-                System.out.println(count);
-                return (count > 0);
-            }
-        }
-        catch (SQLException ex) {
-            LOGGER.log(Level.ERROR, "{}", ex);
-        }
-        return false;
+        return checkRecordExists("ISSUE", "memberID", member.getId());
     }
 
     public boolean updateBook(Book book) {
@@ -300,5 +272,23 @@ public final class DatabaseHandler {
 
     public Connection getConnection() {
         return conn;
+    }
+
+    private boolean checkRecordExists(String tableName, String columnName, String id) {
+        try {
+            String checkstmt = "SELECT COUNT(*) FROM " + tableName + " WHERE " + columnName + "=?";
+            PreparedStatement stmt = conn.prepareStatement(checkstmt);
+            stmt.setString(1, id);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                int count = rs.getInt(1);
+                System.out.println(count);
+                return (count > 0);
+            }
+        }
+        catch (SQLException ex) {
+            LOGGER.log(Level.ERROR, "{}", ex);
+        }
+        return false;
     }
 }
