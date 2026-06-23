@@ -12,10 +12,10 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import library.assistant.alert.AlertMaker;
+import library.assistant.data.model.Member;
 import library.assistant.database.DataHelper;
 import library.assistant.database.DatabaseHandler;
 import library.assistant.ui.listmember.MemberListController;
-import library.assistant.ui.listmember.MemberListController.Member;
 import org.apache.commons.lang3.StringUtils;
 
 public class MemberAddController implements Initializable {
@@ -80,7 +80,7 @@ public class MemberAddController implements Initializable {
             return;
         }
 
-        Member member = new Member(mName, mID, mMobile, mEmail);
+        Member member = new Member(mID, mName, mEmail, mMobile);
         boolean result = DataHelper.insertNewMember(member);
         if (result) {
             AlertMaker.showMaterialDialog(rootPane, mainContainer, new ArrayList<>(), "New member added", mName + " has been added");
@@ -90,7 +90,7 @@ public class MemberAddController implements Initializable {
         }
     }
 
-    public void infalteUI(MemberListController.Member member) {
+    public void infalteUI(Member member) {
         name.setText(member.getName());
         id.setText(member.getId());
         id.setEditable(false);
@@ -108,7 +108,7 @@ public class MemberAddController implements Initializable {
     }
 
     private void handleUpdateMember() {
-        Member member = new MemberListController.Member(name.getText(), id.getText(), mobile.getText(), email.getText());
+        Member member = new Member(id.getText(), name.getText(), email.getText(), mobile.getText());
         if (DatabaseHandler.getInstance().updateMember(member)) {
             AlertMaker.showMaterialDialog(rootPane, mainContainer, new ArrayList<>(), "Success", "Member data updated.");
         } else {
