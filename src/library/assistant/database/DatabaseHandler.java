@@ -37,12 +37,9 @@ public final class DatabaseHandler {
     private static Connection conn = null;
     private static Statement stmt = null;
 
-    static {
+    private DatabaseHandler() {
         createConnection();
         inflateDB();
-    }
-
-    private DatabaseHandler() {
     }
 
     public static DatabaseHandler getInstance() {
@@ -83,14 +80,14 @@ public final class DatabaseHandler {
         }
     }
 
-    private static void createConnection() {
+    private void createConnection() {
         try {
             Class.forName("org.apache.derby.jdbc.EmbeddedDriver").newInstance();
             conn = DriverManager.getConnection(DB_URL);
         }
         catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Cant load database", "Database Error", JOptionPane.ERROR_MESSAGE);
-            System.exit(0);
+            LOGGER.log(Level.ERROR, "Cant load database", e);
+            throw new RuntimeException("Database connection failed", e);
         }
     }
 

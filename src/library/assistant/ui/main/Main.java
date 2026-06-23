@@ -2,10 +2,12 @@ package library.assistant.ui.main;
 
 import javafx.application.Application;
 import static javafx.application.Application.launch;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import library.assistant.alert.AlertMaker;
 import library.assistant.database.DatabaseHandler;
 import library.assistant.exceptions.ExceptionUtil;
 import library.assistant.util.LibraryAssistantUtil;
@@ -31,7 +33,15 @@ public class Main extends Application {
 
         new Thread(() -> {
             ExceptionUtil.init();
-            DatabaseHandler.getInstance();
+            try {
+                DatabaseHandler.getInstance();
+            } catch (Exception e) {
+                LOGGER.log(Level.ERROR, "Database initialization failed", e);
+                Platform.runLater(() -> {
+                    AlertMaker.showErrorMessage(e, "Database Error", "Cant load database");
+                    System.exit(0);
+                });
+            }
         }).start();
     }
 
