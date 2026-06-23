@@ -142,7 +142,7 @@ public class MemberListController implements Initializable {
             Parent parent = loader.load();
 
             MemberAddController controller = (MemberAddController) loader.getController();
-            controller.infalteUI(selectedForEdit);
+            controller.inflateUI(selectedForEdit);
 
             Stage stage = new Stage(StageStyle.DECORATED);
             stage.setTitle("Edit Member");
