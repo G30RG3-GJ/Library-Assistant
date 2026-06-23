@@ -138,6 +138,20 @@ public final class DatabaseHandler {
         }
     }
 
+    public boolean execPreparedUpdate(String query, Object... params) {
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            for (int i = 0; i < params.length; i++) {
+                stmt.setObject(i + 1, params[i]);
+            }
+            stmt.executeUpdate();
+            return true;
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, "Error:" + ex.getMessage(), "Error Occured", JOptionPane.ERROR_MESSAGE);
+            System.out.println("Exception at execPreparedUpdate:dataHandler" + ex.getLocalizedMessage());
+            return false;
+        }
+    }
+
     public boolean deleteBook(Book book) {
         try {
             String deleteStatement = "DELETE FROM BOOK WHERE ID = ?";
