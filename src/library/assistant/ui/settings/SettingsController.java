@@ -6,7 +6,6 @@ import com.jfoenix.controls.JFXSpinner;
 import com.jfoenix.controls.JFXTextField;
 import java.io.File;
 import java.net.URL;
-import java.security.InvalidParameterException;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -110,7 +109,7 @@ public class SettingsController implements Initializable {
             MailServerInfo mailServerInfo
                     = new MailServerInfo(serverName.getText(), Integer.parseInt(smtpPort.getText()), emailAddress.getText(), emailPassword.getText(), sslCheckbox.isSelected());
             if (!mailServerInfo.validate() || !LibraryAssistantUtil.validateEmailAddress(emailAddress.getText())) {
-                throw new InvalidParameterException();
+                throw new IllegalArgumentException();
             }
             return mailServerInfo;
         } catch (Exception exp) {
