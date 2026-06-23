@@ -45,7 +45,7 @@ public class MailServerInfo {
     }
 
     public boolean validate() {
-        boolean flag = mailServer == null || mailServer.isEmpty() || port == null || emailID == null || emailID.isEmpty() || password.isEmpty();
+        boolean flag = mailServer == null || mailServer.isEmpty() || port == null || emailID == null || emailID.isEmpty() || password == null || password.isEmpty();
         return !flag;
     }
 }
